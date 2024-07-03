@@ -106,8 +106,9 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
     for line in vcf_file:
         if line[0] != '#':
             contain = line.split('\t')
+            print(contain)
             # (chromosome, position, ref, alt)
-            variant = (contain[0], contain[1], contain[3], contain[4])
+            variant = (contain[0], int(contain[1]), contain[3], contain[4])
             # returns smaller, in or bigger. Relative pos of promoter to variant
             relPos = variantInBound(start_prom, end_prom, promoter_regions[pointer_promoter], variant)
             # step to next promoter if current is downstream
