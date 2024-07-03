@@ -19,4 +19,15 @@ start_prom = args.s
 end_prom = args.e
 
 
+# safe promoter regions as tuple (chromosome, position TSS)
+promoter_regions = []
 
+with open(promoter_path, 'r') as file:
+    # get promoters regions of all promoters
+    for line in file:
+        if line[0] != '#':
+            contain = line.split('\t')
+            chrom = contain[0]
+            pos = contain[1]
+            # add to promoter regions
+            promoter_regions.add(chrom, pos)
