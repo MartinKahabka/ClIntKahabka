@@ -116,7 +116,7 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
             relPos = variantInBound(start_prom, end_prom, promoter_regions[pointer_promoter], variant)
             # step to next promoter if current is downstream
             if relPos == "smaller":
-                while variantInBound(start_prom, end_prom, promoter_regions[pointer_promoter], variant) == "smaller":
+                while variantInBound(start_prom, end_prom, promoter_regions[pointer_promoter], variant) == "smaller" and pointer_promoter+1 != len(promoter_regions):
                     pointer_promoter += 1
             
             if relPos == "in":
