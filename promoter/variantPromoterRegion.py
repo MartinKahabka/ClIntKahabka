@@ -41,7 +41,7 @@ def variantInBound(start, end, prom, variant) -> str:
     # check if chromosoms are equal
     if chrToNumber(prom[0]) == chrToNumber(variant[0]): 
         # define bound and check
-        downBound = promPos- start
+        downBound = promPos - start
         upBound = promPos +  end
         if  downBound <= variantPos <= upBound:
             return "in"
@@ -74,25 +74,29 @@ end_prom = int(args.end)
 promoter_regions = []
 
 # read in promoter regions
+print("--- READ IN PROMOTER FILE ---")
 with open(promoter_path, 'r') as file:
     # get promoters regions of all promoters
     for line in file:
         if line[0] != '#':
             contain = line.split('\t')
+            print(contain)
             chrom = contain[0]
             pos = int(contain[1])
+            name = contain[3]
             # add to promoter regions
-            promoter_regions.append((chrom, pos))
+            promoter_regions.append((chrom, pos, name))
             
 # sort in case promoter regions aren't sorted
 sorter = cmp_to_key(sortGenePos)
 promoter_regions.sort(key = sorter)
+print("--- SUCCESS ---")
 
 # name output file
 filename_vcf = os.path.basename(vcf_path)
 full_output_path = os.path.join(output_path, name + "_promoterVcfs_" + filename_vcf)
-print(full_output_path)
 
+print("--- START LOOKING FOR VCFS IN PROMOTER REGIONS IN: " + vcf_path + " ---")
 # read in vcf of patient
 with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs_file:
     # write information into promoter vcf file
@@ -104,9 +108,8 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
     # keep pointer on promoter, due to sorted arrays in O(n), n : num Vcfs in vcf file
     pointer_promoter = 0
     for line in vcf_file:
-        if line[0] != '#':
+        if line[0] != '#' and line[0] != '\n':
             contain = line.split('\t')
-            print(contain)
             # (chromosome, position, ref, alt)
             variant = (contain[0], int(contain[1]), contain[3], contain[4])
             # returns smaller, in or bigger. Relative pos of promoter to variant
@@ -117,4 +120,7 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
                     pointer_promoter += 1
             
             if relPos == "in":
+                print("found vcf in promoter " + promoter_regions[pointer_promoter][2] + " on " + promoter_regions[pointer_promoter][0] + ", pos: " + str(contain[1]))
                 filter_vcfs_file.write(line)
+                
+print("SUCCESS: PROGRAMM FINISHED")
