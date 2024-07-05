@@ -100,11 +100,11 @@ print("--- START LOOKING FOR VCFS IN PROMOTER REGIONS IN: " + vcf_path + " ---")
 # read in vcf of patient
 with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs_file:
     # write information into promoter vcf file
-    filter_vcfs_file.write("# Name of file: " + os.path.basename(full_output_path))
-    filter_vcfs_file.write("# Name of process: " + name)
-    filter_vcfs_file.write("# Patient vcf file path: " + vcf_path)
-    filter_vcfs_file.write("# Promoter region file path:" + promoter_path)
-    filter_vcfs_file.write("# Length Down/Upstream region of promoter TSS side: " + str(start_prom) + "/" + str(end_prom))
+    filter_vcfs_file.write("# Name of file: " + os.path.basename(full_output_path) + "\n")
+    filter_vcfs_file.write("# Name of process: " + name + "\n")
+    filter_vcfs_file.write("# Patient vcf file path: " + vcf_path + "\n")
+    filter_vcfs_file.write("# Promoter region file path:" + promoter_path + "\n")
+    filter_vcfs_file.write("# Length Down/Upstream region of promoter TSS side: " + str(start_prom) + "/" + str(end_prom) + "\n")
     # keep pointer on promoter, due to sorted arrays in O(n), n : num Vcfs in vcf file
     pointer_promoter = 0
     for line in vcf_file:
