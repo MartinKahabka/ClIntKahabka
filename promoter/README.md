@@ -18,8 +18,8 @@ Definiert den Ordner indem die Outputfiles gespeichert werden. Falls der Ordner 
 5. start: Definiert die Länge des Promoters, downstream von der TSS des Promoters. Ist der Wert also bei "1000", so werden 1000 Basen downstream vom Promoter als Teil der Promoterregion erachtet und dort wird nach Varianten gesucht.
 6. end: Identisch mit 'start', allerdings upstream vom Promoter
 
-Beispiel:
-sh ./runVariantProm.sh "beta" "/output" "/input" "informationAndData/GRCh37_promoterChrPos.bed" "500" "100"     
+Beispiel (von /kahabka/ClIntKahabka/promoter aus)
+sh ./runVariantProm.sh "standart" "../../promoterResults" "../../../old/ClInt/combined_folder_dna/vcf_dna" "../../dEGenes/GRCh37_promoterChrPos.bed" "500" "100"  
 
 
 Begriffe
