@@ -83,9 +83,9 @@ with open(promoter_path, 'r') as file:
             print(contain)
             chrom = contain[0]
             pos = int(contain[1])
-            name = contain[3]
+            name_prom = contain[3]
             # add to promoter regions
-            promoter_regions.append((chrom, pos, name))
+            promoter_regions.append((chrom, pos, name_prom))
             
 # sort in case promoter regions aren't sorted
 sorter = cmp_to_key(sortGenePos)
