@@ -1,3 +1,7 @@
+import argparse
+import os
+import re
+
 # author: Martin Kahabka
 
 # this file should input the output if "runVariantProm.sh" and return a tsv as described on git
@@ -22,3 +26,26 @@
 #       save ID to correlation array
 # iterate over variants and fill number of patients where variant was not found (see number severe/not severe patients)
 # save file in described format (see git)
+
+# gets a string and a regex pattern that describes the unique ID of the patient
+def extract_id(name, pattern) -> str:
+    id = re.search(pattern, name).group()
+    return id
+
+
+parser = argparse.ArgumentParser(description="Process input directory")
+parser.add_argument("-i", "--input_dir", help="Path to the input directory")
+args = parser.parse_args()
+
+### informationAndData/output_promoter/
+# get parameters
+input_path = args.input_dir
+
+# get IDs of patients
+ids = []
+for file in os.listdir(input_path):
+    pattern = r"FO\d*x\d*"
+    patient_ID = extract_id(file, pattern)
+    ids.append(patient_ID)
+
+print(ids)
