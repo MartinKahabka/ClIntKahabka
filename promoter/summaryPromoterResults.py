@@ -77,4 +77,4 @@ print("--- SUCCESSFUL: number of files: " + str(counter_pat))
 # extract lab_ID from patients
 print("--- READ IN CONDITIONS OF PATIENTS ---")
 id_and_condition, counter_severe, counter_not_severe = add_conditions(id_and_condition, info_file_path)
-print("--- SUCCESFUL: number of severe/not severe patients: " + str(counter_severe) + "/" + str(counter_not_severe))
+print("--- SUCCESFUL: number of severe/not severe patients: " + str(counter_severe) + "/" + str(counter_not_severe) + " ---")
