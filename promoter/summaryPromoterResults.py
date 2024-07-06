@@ -32,6 +32,24 @@ def extract_id(name, pattern) -> str:
     id = re.search(pattern, name).group()
     return id
 
+def add_conditions(dict_id, filename):
+    num_severe = 0
+    num_not_severe = 0
+    with open(info_file_path, 'r') as info_file:
+        for line in info_file:
+            content = line.split("\t")
+            # check for header line
+            lab_id = content[2]
+            condition = content[15]
+            # check if lab id correlates to patient
+            if lab_id != "Lab ID" and lab_id in id_and_condition:
+                dict_id[lab_id] = condition
+                # check type of condition
+                if condition == "COVID severe":
+                    num_severe += 1
+                else:
+                    num_not_severe += 1
+    return (dict_id, num_severe, num_not_severe)
 
 parser = argparse.ArgumentParser(description="Process input directory")
 parser.add_argument("-i", "--input_dir", help="Path to the input directory of the filtered vcfs")
@@ -58,21 +76,5 @@ print("--- SUCCESSFUL: number of files: " + str(counter_pat))
 # read conditions from Q001H_sample_preparations_20230803115337.tsv
 # extract lab_ID from patients
 print("--- READ IN CONDITIONS OF PATIENTS ---")
-counter_severe = 0
-counter_not_severe = 0
-with open(info_file_path, 'r') as info_file:
-    for line in info_file:
-        content = line.split("\t")
-        # check for header line
-        lab_id = content[2]
-        condition = content[15]
-        # check if lab id correlates to patient
-        if lab_id != "Lab ID" and lab_id in id_and_condition:
-            id_and_condition[lab_id] = condition
-            # check type of condition
-            if condition == "COVID severe":
-                counter_severe += 1
-            else:
-                counter_not_severe += 1
+id_and_condition, counter_severe, counter_not_severe = add_conditions(id_and_condition, info_file_path)
 print("--- SUCCESFUL: number of severe/not severe patients: " + str(counter_severe) + "/" + str(counter_not_severe))
-
