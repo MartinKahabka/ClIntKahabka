@@ -23,10 +23,17 @@ def extract_id(name, pattern) -> str:
     id = re.search(pattern, name).group()
     return id
 
+# input: dict, str
+# dict_id: dict with lab ids as keys
+# filename: path to file that contains the condition of the patients
+# output: (dict, int, int)
+# dict_id: input dict with added conditions
+# num_severe: number of patients with condition severe
+# num_not_severe: number of patients with other condition
 def add_conditions(dict_id, filename):
     num_severe = 0
     num_not_severe = 0
-    with open(info_file_path, 'r') as info_file:
+    with open(filename, 'r') as info_file:
         for line in info_file:
             content = line.split("\t")
             # check for header line
@@ -51,21 +58,68 @@ args = parser.parse_args()
 # get parameters
 input_path = args.input_dir
 info_file_path = args.patient_info
+pattern = r"FO\d*x\d*"
 
 # get IDs of patients
 print("--- READ IN LAB IDS OF PATIENTS FOR PROMTER VCF FILES ---")
+
 counter_pat = 0
 id_and_condition = {}
 for file in os.listdir(input_path):
     counter_pat += 1
-    pattern = r"FO\d*x\d*"
     patient_ID = extract_id(file, pattern)
     id_and_condition[patient_ID] = ""
 
 print("--- SUCCESSFUL: number of files: " + str(counter_pat))
-## 
+
 # read conditions from Q001H_sample_preparations_20230803115337.tsv
 # extract lab_ID from patients
 print("--- READ IN CONDITIONS OF PATIENTS ---")
+
 id_and_condition, counter_severe, counter_not_severe = add_conditions(id_and_condition, info_file_path)
+
 print("--- SUCCESFUL: number of severe/not severe patients: " + str(counter_severe) + "/" + str(counter_not_severe) + " ---")
+
+
+# dict entry: key = chr/pos, value = (severePos, severeNeg, notSeverePos, not SevereNeg)
+# define
+# mutation [(str)]
+print("--- READ IN VARIANTS FROM PROMTER VCF FILES ---")
+# read in all variants from each file
+variant_information = {}
+for file_name in os.listdir(input_path):
+    print("Working in file: " + file_name)
+    # get lab id
+    lab_id = extract_id(file_name, pattern)
+    with open(input_path + "/" + file_name, 'r') as file:
+        for line in file:
+            # check for comments
+            if line[0] != '#':
+                content = line.split('\t')
+                # get relevant values
+                chrom = content[0]
+                pos = int(content[1])
+                severe = (True if id_and_condition[lab_id] == "COVID severe" else False)
+                # check if variant is in dict
+                if (chrom, pos) in variant_information:
+                    # update dict
+                    value = variant_information.get((chrom, pos))
+                    if severe:
+                        value[0] += 1
+                    else:
+                        value[2] += 1
+                else:
+                    # create entry
+                    if severe:
+                        variant_information[(chrom, pos)] = [1, 0, 0, 0]
+                    else:
+                        variant_information[(chrom, pos)] = [0, 0, 1, 0]
+                    
+# fill up dict and save file
+for variant in variant_information:
+    value = variant_information.get(variant)
+    value[1] = counter_severe - value[0]
+    value[3] = counter_not_severe - value[2]
+    variant_information[variant] = value
+    print(variant_information.get(variant))
+                    
