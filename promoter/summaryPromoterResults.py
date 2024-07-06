@@ -34,18 +34,45 @@ def extract_id(name, pattern) -> str:
 
 
 parser = argparse.ArgumentParser(description="Process input directory")
-parser.add_argument("-i", "--input_dir", help="Path to the input directory")
+parser.add_argument("-i", "--input_dir", help="Path to the input directory of the filtered vcfs")
+parser.add_argument("-p", "--patient_info", help="File with general information of patients")
 args = parser.parse_args()
 
 ### informationAndData/output_promoter/
 # get parameters
 input_path = args.input_dir
+info_file_path = args.patient_info
 
 # get IDs of patients
-ids = []
+print("--- READ IN LAB IDS OF PATIENTS FOR PROMTER VCF FILES ---")
+counter_pat = 0
+id_and_condition = {}
 for file in os.listdir(input_path):
+    counter_pat += 1
     pattern = r"FO\d*x\d*"
     patient_ID = extract_id(file, pattern)
-    ids.append(patient_ID)
+    id_and_condition[patient_ID] = ""
 
-print(ids)
+print("--- SUCCESSFUL: number of files: " + str(counter_pat))
+## 
+# read conditions from Q001H_sample_preparations_20230803115337.tsv
+# extract lab_ID from patients
+print("--- READ IN CONDITIONS OF PATIENTS ---")
+counter_severe = 0
+counter_not_severe = 0
+with open(info_file_path, 'r') as info_file:
+    for line in info_file:
+        content = line.split("\t")
+        # check for header line
+        lab_id = content[2]
+        condition = content[15]
+        # check if lab id correlates to patient
+        if lab_id != "Lab ID" and lab_id in id_and_condition:
+            id_and_condition[lab_id] = condition
+            # check type of condition
+            if condition == "COVID severe":
+                counter_severe += 1
+            else:
+                counter_not_severe += 1
+print("--- SUCCESFUL: number of severe/not severe patients: " + str(counter_severe) + "/" + str(counter_not_severe))
+
