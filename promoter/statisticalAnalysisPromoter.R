@@ -19,15 +19,8 @@ corrected_p_value <- standart_p_value / num_variants
 # no variant |  row[5] |    row[6]
 
 # dataframe chr pos sig? 
-results_analysis <- data.frame(
-    matrix(
-        c(1, 0, 0),
-        nrow = 1,
-        ncol = 3),
-    stringsAsFactors = FALSE
-)
-colnames(results_analysis) <- c("NumChr", "PosOnChr", "significant")
-print(results_analysis)
+col_result <- c("ChrNum", "PosOnChr", "resultAnalysis", "p_value")
+results_matrix <- matrix(nrow = 0, ncol = length(col_result))
 
 for (i in seq_len(nrow(data))) {
     current <- data[i, ]
@@ -46,7 +39,15 @@ for (i in seq_len(nrow(data))) {
     } else {
         result <- "not_significant"
     }
-    new_row <- c(current[[1]], current[[2]], result)
-    results_analysis <- rbind(results_analysis, new_row)
+    new_row <- c(current[[1]], current[[2]], result, p_value_of_test)
+    results_matrix <- rbind(results_matrix, new_row)
 }
+# write over to data frame
+results_analysis <- data.frame(
+    results_matrix,
+    row.names = seq_len(nrow(data)),
+    stringsAsFactors = FALSE
+)
+colnames(results_analysis) <- col_result
+
 print(results_analysis)
