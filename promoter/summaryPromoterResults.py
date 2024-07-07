@@ -78,7 +78,9 @@ def comments_file(filename, input_file_path, num_severe, num_not_severe) -> str:
     comment += "# output to " + filename + "\n"
     comment += "# number of patients: " + str(num_severe + num_not_severe) + "\n"
     comment += "# number of severe/not severe patients: " + str(num_severe) + "/" + str(num_not_severe) + "\n"
-    comment += "# chromosome position with_variant_Severe without_variant_Severe with_variant_NotSevere without_variant_NotSevere" + "\n"
+    comment += "# pos/neg corresponds to number of patients where variant is there/not there" + "\n"
+    comment += "# severe/NotSevere corresponds to number of patients with have severe/not severe condition" + "\n"
+    comment += "chromosome\tposition\tposSevere\tnegSevere\tposNotSevere\tnegNotSevere" + "\n"
     return comment
 
 parser = argparse.ArgumentParser(description="Process input directory")
