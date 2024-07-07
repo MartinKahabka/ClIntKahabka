@@ -49,15 +49,49 @@ def add_conditions(dict_id, filename):
                     num_not_severe += 1
     return (dict_id, num_severe, num_not_severe)
 
+# gets dict and fills up the negative counter (num of patients that do not have the mutation) 
+# of the dictionary according to the counter of num_severe and num_not_severe
+def fill_up_dict(dict_variant, num_severe, num_not_severe) -> dict:
+    # fill up posNegative and negNegative
+    for variant in dict_variant:
+        value = dict_variant.get(variant)
+        value[1] = num_severe - value[0]
+        value[3] = num_not_severe - value[2]
+        dict_variant[variant] = value
+    return dict_variant
+
+# gets the information about a variant and returns a string containing the information
+def variant_to_string(name, infos) -> str:
+    str_infos = ""
+    for i in infos:
+        str_infos += "\t" + str(i)
+    str_name = name[0] + "\t" + str(name[1])
+    return str_name + str_infos
+
+def comments_file(filename, input_file_path, num_severe, num_not_severe) -> str:
+    # extract unique name from pipeline
+    unique_name = os.path.split(input_file_path)[-1]
+    # build comment
+    comment = ""
+    comment += "# unique identifier: " + unique_name + "\n"
+    comment += "# input from " + input_file_path + "\n"
+    comment += "# output to " + filename + "\n"
+    comment += "# number of patients: " + str(num_severe + num_not_severe) + "\n"
+    comment += "# number of severe/not severe patients: " + str(num_severe) + "/" + str(num_not_severe) + "\n"
+    comment += "# chromosome position with_variant_Severe without_variant_Severe with_variant_NotSevere without_variant_NotSevere" + "\n"
+    return comment
+
 parser = argparse.ArgumentParser(description="Process input directory")
 parser.add_argument("-i", "--input_dir", help="Path to the input directory of the filtered vcfs")
 parser.add_argument("-p", "--patient_info", help="File with general information of patients")
+parser.add_argument("-o", "--output_dir", help="Path of output file")
 args = parser.parse_args()
 
 ### informationAndData/output_promoter/
 # get parameters
 input_path = args.input_dir
 info_file_path = args.patient_info
+output_file_path = args.output_dir
 pattern = r"FO\d*x\d*"
 
 # get IDs of patients
@@ -114,12 +148,17 @@ for file_name in os.listdir(input_path):
                         variant_information[(chrom, pos)] = [1, 0, 0, 0]
                     else:
                         variant_information[(chrom, pos)] = [0, 0, 1, 0]
+                        
+print("--- SUCCESFUL ---")
                     
-# fill up dict and save file
-for variant in variant_information:
-    value = variant_information.get(variant)
-    value[1] = counter_severe - value[0]
-    value[3] = counter_not_severe - value[2]
-    variant_information[variant] = value
-    print(variant_information.get(variant))
-                    
+print("--- SAVE FILE TO " + output_file_path + " ---")
+# fill up dict
+variant_information = fill_up_dict(variant_information, counter_severe, counter_not_severe)
+# save to file
+with open(output_file_path, 'w') as output_file:
+    c = comments_file(output_file_path, input_path, counter_severe, counter_not_severe)
+    output_file.write(c)
+    for variant in variant_information:
+        s = variant_to_string(variant, variant_information[variant])
+        output_file.write(s + "\n")
+print("--- SUCCESSFUL -> PROGRAMM TERMINATES ---")
