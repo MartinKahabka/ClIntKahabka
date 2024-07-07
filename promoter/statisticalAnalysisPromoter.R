@@ -1,3 +1,6 @@
+# author: Martin Kahabka
+library(readr)
+
 args <- commandArgs(trailingOnly = TRUE)
 input_path <- args[1]
 output_path <- args[2]
@@ -50,4 +53,6 @@ results_analysis <- data.frame(
 )
 colnames(results_analysis) <- col_result
 
+# save in file
+write_tsv(results_analysis, path = output_path)
 print(results_analysis)
