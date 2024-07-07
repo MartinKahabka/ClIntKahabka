@@ -1,8 +1,9 @@
 args <- commandArgs(trailingOnly = TRUE)
-path <- args[1]
+input_path <- args[1]
+output_path <- args[2]
 
 # read in data, get total number of patients
-data <- read.table(path, sep = "\t", header = TRUE)
+data <- read.table(input_path, sep = "\t", header = TRUE)
 num_variants <- nrow(data)
 
 # p-value bonferroni correction
@@ -16,8 +17,17 @@ corrected_p_value <- standart_p_value / num_variants
 #            | severe  | not severe
 # variant    |  row[3] |    row[4]
 # no variant |  row[5] |    row[6]
-data_frame <- data.frame(column1 = c(1, 2, 3), column2 = c("a", "b", "c"))
-print(data_frame)
+
+# dataframe chr pos sig? 
+results_analysis <- data.frame(
+    matrix(
+        c(1, 0, 0),
+        nrow = 1,
+        ncol = 3),
+    stringsAsFactors = FALSE
+)
+colnames(results_analysis) <- c("NumChr", "PosOnChr", "significant")
+print(results_analysis)
 
 for (i in seq_len(nrow(data))) {
     current <- data[i, ]
@@ -27,5 +37,16 @@ for (i in seq_len(nrow(data))) {
         "notSevere" = c(current[[5]], current[[6]]),
         row.names = c("variant", "not variant")
     )
+    # compute fisher exact test for variant
     test <- fisher.test(values)
+    # get values for ouput file
+    p_value_of_test <- summary(test)[1, 1]
+    if (p_value_of_test <= corrected_p_value) {
+        result <- "significant"
+    } else {
+        result <- "not_significant"
+    }
+    new_row <- c(current[[1]], current[[2]], result)
+    results_analysis <- rbind(results_analysis, new_row)
 }
+print(results_analysis)
