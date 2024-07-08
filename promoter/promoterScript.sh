@@ -3,7 +3,6 @@
 # output_promoter/name1/summary
 # output_promoter/name1/statistical
 #               ./name2
-
 echo "name: $1"
 echo "output_path: $2"
 echo "input_path_vcf_patient: $3"

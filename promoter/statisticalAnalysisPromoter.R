@@ -57,3 +57,5 @@ colnames(results_analysis) <- col_result
 
 # save in file
 write_tsv(results_analysis, path = output_path)
+
+print("--- SUCCESFUL ---")

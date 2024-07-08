@@ -1,4 +1,4 @@
-
+echo "--- RUNNING PRORAM RUNVARIANTPROM.SH ---"
 # read in parameters
 echo "name: $1"
 echo "output_path: $2"
@@ -36,4 +36,5 @@ for file in $files; do
     python3 "variantPromoterRegion.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end"
 done
 # python3 variantPromoterRegion.py -n "alpha" -o "informationAndData/vcfsPromoter/" -v "informationAndData/test_vcf_file" -p informationAndData/GRCh37_promoterChrPos_testCopy.bed -s "500" -o "100"
-#
+
+echo "--- PROGRAMM FINISHED ---"
