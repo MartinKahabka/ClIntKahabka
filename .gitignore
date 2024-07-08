@@ -25,3 +25,6 @@
 /promoter/informationAndData/
 /promoter/output_summary/
 /promoter/output_statistical_analysis/
+/promoter/.nextflow/
+/promoter/work/
+/promoter/bin/
