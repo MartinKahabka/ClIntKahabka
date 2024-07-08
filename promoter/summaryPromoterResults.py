@@ -83,6 +83,8 @@ def comments_file(filename, input_file_path, num_severe, num_not_severe) -> str:
     comment += "chromosome\tposition\tposSevere\tnegSevere\tposNotSevere\tnegNotSevere" + "\n"
     return comment
 
+print("--- START PROGRAM SUMMARYPROMOTERRESULTS.PY ---")
+
 parser = argparse.ArgumentParser(description="Process input directory")
 parser.add_argument("-i", "--input_dir", help="Path to the input directory of the filtered vcfs")
 parser.add_argument("-p", "--patient_info", help="File with general information of patients")
@@ -95,6 +97,12 @@ input_path = args.input_dir
 info_file_path = args.patient_info
 output_file_path = args.output_dir
 pattern = r"FO\d*x\d*"
+
+# print args
+print(input_path)
+print(info_file_path)
+print(output_file_path)
+
 
 # get IDs of patients
 print("--- READ IN LAB IDS OF PATIENTS FOR PROMTER VCF FILES ---")
