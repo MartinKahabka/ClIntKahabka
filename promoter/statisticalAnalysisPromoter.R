@@ -1,10 +1,13 @@
 # author: Martin Kahabka
+print("--- START PROGRAMM STATISTICALANALYSISPROMOTER.R")
 library(readr)
 
 args <- commandArgs(trailingOnly = TRUE)
 input_path <- args[1]
 output_path <- args[2]
 
+print(input_path)
+print(output_path)
 # read in data, get total number of patients
 data <- read.table(input_path, sep = "\t", header = TRUE)
 num_variants <- nrow(data)
@@ -24,7 +27,6 @@ corrected_p_value <- standart_p_value / num_variants
 # dataframe chr pos sig? 
 col_result <- c("ChrNum", "PosOnChr", "resultAnalysis", "p_value")
 results_matrix <- matrix(nrow = 0, ncol = length(col_result))
-
 for (i in seq_len(nrow(data))) {
     current <- data[i, ]
     # define matrix for fishers test

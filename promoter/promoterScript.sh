@@ -23,6 +23,7 @@ path_patient=$7
 full_output_path="$output_path/$name"
 output_path_vcf="$full_output_path/vcf_promoter_regions"
 output_path_summary="$full_output_path/summary_promoter.tsv"
+output_path_statistcal="$full_output_path/statistical_result.tsv"
 # create output_path
 if [ ! -d "$output_path" ]; then
     mkdir "$output_path"
@@ -43,3 +44,4 @@ sh ./runVariantProm.sh $name $full_output_path $input_path_vcf_patient $promoter
 python3 summaryPromoterResults.py -i "$output_path_vcf" -p "$path_patient" -o "$output_path_summary"
 
 # run third script
+Rscript statisticalAnalysisPromoter.R "$output_path_summary" "$output_path_statistcal"
