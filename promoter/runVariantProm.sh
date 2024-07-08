@@ -17,7 +17,7 @@ end=$6
 # pattern matching for dna_vcf files
 pattern="*.vcf"
 files=$(find "$input_path" -name "$pattern")
-full_output_path="$output_path/$name"
+full_output_path="$output_path/vcf_promoter_regions"
 
 # create dir, check for output dir
 if [ ! -d "$output_path"]; then
@@ -25,7 +25,9 @@ if [ ! -d "$output_path"]; then
 fi
 
 # create subfolder
-mkdir -p "$full_output_path"
+if [ ! -d "$full_output_path"]; then
+    mkdir -p "$full_output_path"
+fi
 
 for file in $files; do
     full_input_path="$input_path/$file"

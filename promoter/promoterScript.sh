@@ -25,5 +25,5 @@ if [ ! -d "$output_path"]; then
 fi
 
 if [ ! -d "$full_output_path"]; then
-    mkdir "$full_output_path"
+    mkdir -p "$full_output_path"
 fi
