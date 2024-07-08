@@ -49,7 +49,8 @@ def variantInBound(start, end, prom, variant) -> str:
             return "bigger" if relPos == 1 else "smaller"
     else:
         return "bigger" if relPos == 1 else "smaller"
-            
+
+print("--- START PROGRAMM VARIANTPROMOTERREGION.PY ---")
 
 parser = argparse.ArgumentParser(prog='variantPromoterRegion.py', description='Description of your script')
 
@@ -80,7 +81,6 @@ with open(promoter_path, 'r') as file:
     for line in file:
         if line[0] != '#':
             contain = line.split('\t')
-            print(contain)
             chrom = contain[0]
             pos = int(contain[1])
             name_prom = contain[3]
