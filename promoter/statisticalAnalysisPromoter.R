@@ -54,5 +54,4 @@ results_analysis <- data.frame(
 colnames(results_analysis) <- col_result
 
 # save in file
-write_tsv(results_analysis, file = output_path)
-print(results_analysis)
+write_tsv(results_analysis, path = output_path)
