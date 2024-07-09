@@ -6,12 +6,13 @@ import os
 #python3
 
 def chrToNumber(chrom):
-    if chrom == 'X':
+    rest = int(chrom[3:])
+    if rest == 'X':
         return 23
-    if chrom == 'Y':
+    if rest == 'Y':
         return 24
     else:
-        return int(chrom[3:])
+        return rest
 
 def sortGenePos(x1, x2):
     # get chr
