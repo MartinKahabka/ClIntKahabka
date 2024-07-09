@@ -11,6 +11,8 @@ def chrToNumber(chrom):
         return 23
     if rest == 'Y':
         return 24
+    if rest == "MT":
+        return 25
     else:
         return int(rest)
 
