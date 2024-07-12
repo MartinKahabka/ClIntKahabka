@@ -72,7 +72,7 @@ def variant_to_string(name, infos) -> str:
     str_name = name[0] + "\t" + str(name[1])
     return str_name + str_infos
 
-def comments_file(filename, input_file_path, num_severe, num_not_severe) -> str:
+def comments_file(filename, input_file_path, num_severe, num_not_severe, numVariants) -> str:
     # extract unique name from pipeline
     unique_name = os.path.split(input_file_path)[-1]
     # build comment
@@ -82,6 +82,7 @@ def comments_file(filename, input_file_path, num_severe, num_not_severe) -> str:
     comment += "# output to " + filename + "\n"
     comment += "# number of patients: " + str(num_severe + num_not_severe) + "\n"
     comment += "# number of severe/not severe patients: " + str(num_severe) + "/" + str(num_not_severe) + "\n"
+    comment += "# number of variants found: " + numVariants + "\n"
     comment += "# pos/neg corresponds to number of patients where variant is there/not there" + "\n"
     comment += "# severe/NotSevere corresponds to number of patients with have severe/not severe condition" + "\n"
     comment += "chromosome\tposition\tposSevere\tnegSevere\tposNotSevere\tnegNotSevere" + "\n"
@@ -172,7 +173,7 @@ print("--- SAVE FILE TO " + output_file_path + " ---")
 variant_information = fill_up_dict(variant_information, counter_severe, counter_not_severe)
 # save to file
 with open(output_file_path, 'w') as output_file:
-    c = comments_file(output_file_path, input_path, counter_severe, counter_not_severe)
+    c = comments_file(output_file_path, input_path, counter_severe, counter_not_severe, len(variant_information))
     output_file.write(c)
     for variant in variant_information:
         s = variant_to_string(variant, variant_information[variant])
