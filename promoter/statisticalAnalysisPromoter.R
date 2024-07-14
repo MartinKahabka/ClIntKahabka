@@ -38,7 +38,7 @@ for (i in seq_len(nrow(data))) {
     # compute fisher exact test for variant
     test <- fisher.test(values)
     # get values for ouput file
-    p_value_of_test <- summary(test)[1, 1]
+    p_value_of_test <- test$p.value
     if (p_value_of_test <= corrected_p_value) {
         result <- "significant"
     } else {
