@@ -82,7 +82,7 @@ def comments_file(filename, input_file_path, num_severe, num_not_severe, numVari
     comment += "# output to " + filename + "\n"
     comment += "# number of patients: " + str(num_severe + num_not_severe) + "\n"
     comment += "# number of severe/not severe patients: " + str(num_severe) + "/" + str(num_not_severe) + "\n"
-    comment += "# number of variants found: " + numVariants + "\n"
+    comment += "# number of variants found: " + str(numVariants) + "\n"
     comment += "# pos/neg corresponds to number of patients where variant is there/not there" + "\n"
     comment += "# severe/NotSevere corresponds to number of patients with have severe/not severe condition" + "\n"
     comment += "chromosome\tposition\tposSevere\tnegSevere\tposNotSevere\tnegNotSevere" + "\n"
