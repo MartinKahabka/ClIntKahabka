@@ -144,27 +144,32 @@ for file_name in os.listdir(input_path):
     if  id_and_condition[lab_id] != "" and lab_id != "nullID":
         # opens vcf file of specific patient
         with open(input_path + "/" + file_name, 'r') as file:
+            double_variants = set()
             for line in file:
                 # check for comments
                 if line[0] != '#':
                     content = line.split('\t')
                     # get relevant values
+                    # get rid of doubled vcf values
                     chrom = content[0]
                     pos = int(content[1])
+                    key = (chrom, pos)
                     # check if variant is in dict
-                    if (chrom, pos) in variant_information:
+                    if key in variant_information:
                         # update dict
-                        value = variant_information.get((chrom, pos))
-                        if severe:
-                            value[0] += 1
-                        else:
-                            value[2] += 1
+                        value = variant_information.get(key)
+                        if key not in double_variants:
+                            if severe:
+                                value[0] += 1
+                            else:
+                                value[2] += 1
                     else:
                         # create entry
+                        double_variants.add(key)
                         if severe:
-                            variant_information[(chrom, pos)] = [1, 0, 0, 0]
+                            variant_information[key] = [1, 0, 0, 0]
                         else:
-                            variant_information[(chrom, pos)] = [0, 0, 1, 0]
+                            variant_information[key] = [0, 0, 1, 0]
                         
 print("--- SUCCESFUL ---")
                     
