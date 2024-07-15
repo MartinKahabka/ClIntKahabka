@@ -163,6 +163,7 @@ for file_name in os.listdir(input_path):
                                 value[0] += 1
                             else:
                                 value[2] += 1
+                            double_variants.add(key)
                     else:
                         # create entry
                         double_variants.add(key)
@@ -172,7 +173,6 @@ for file_name in os.listdir(input_path):
                             variant_information[key] = [0, 0, 1, 0]
                         
 print("--- SUCCESFUL ---")
-                    
 print("--- SAVE FILE TO " + output_file_path + " ---")
 # fill up dict
 variant_information = fill_up_dict(variant_information, counter_severe, counter_not_severe)
