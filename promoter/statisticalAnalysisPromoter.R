@@ -1,8 +1,12 @@
 # author: Martin Kahabka
 print("--- START PROGRAMM STATISTICALANALYSISPROMOTER.R")
-library(tzdb, lib.loc = "./rLibs")
- library(readr, lib.loc = "./rLibs")
-+library(vroom, lib.loc = "./rLibs")
+tryCatch({
+    library(tzdb, lib.loc = "./rLibs")
+    library(readr, lib.loc = "./rLibs")
+    library(vroom, lib.loc = "./rLibs")
+}, error = function(error) {
+    library(readr)}) 
+
 
 args <- commandArgs(trailingOnly = TRUE)
 input_path <- args[1]
