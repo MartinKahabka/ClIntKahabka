@@ -14,7 +14,7 @@ input_path=$3
 promoter_path=$4
 start=$5
 end=$6
-fast=$8
+fast=$7
 
 # pattern matching for dna_vcf files
 pattern="*.vcf"
@@ -31,7 +31,7 @@ if [ ! -d "$full_output_path" ]; then
     mkdir -p "$full_output_path"
 fi
 
-if [ $fast -eq "True" ]; then
+if [[ "$fast" == "true" ]]; then
     for file in $files; do
     full_input_path="$input_path/$file"
     echo filename "$file"
