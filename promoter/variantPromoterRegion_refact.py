@@ -199,7 +199,7 @@ def sortGenePos(x1, x2):
     # pos are exactly the same
     return 0
 
-print("--- START PROGRAMM VARIANTPROMOTERREGION.PY ---")
+print("--- START PROGRAMM VARIANTPROMOTERREGION_REFACT.PY ---")
 
 parser = argparse.ArgumentParser(prog='variantPromoterRegion.py', description='Description of your script')
 
