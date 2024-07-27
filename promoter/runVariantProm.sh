@@ -1,3 +1,5 @@
+#!/bin/bash -v 3.2  # Use version 3.2
+
 echo "--- RUNNING PRORAM RUNVARIANTPROM.SH ---"
 # read in parameters
 echo "name: $1"
