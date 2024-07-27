@@ -10,6 +10,7 @@ echo "promoter_path: $4"
 echo "start: $5"
 echo "end: $6"
 echo "path_patient_info: $7"
+echo "fast: $8"
 
 name=$1
 output_path=$2
@@ -18,6 +19,7 @@ promoter_path=$4
 start=$5
 end=$6
 path_patient=$7
+fast=$8
 
 full_output_path="$output_path/$name"
 output_path_vcf="$full_output_path/vcf_promoter_regions"
@@ -37,7 +39,7 @@ if [ ! -d "$output_path_vcf" ]; then
 fi
 
 # run first script
-sh ./runVariantProm.sh $name $full_output_path $input_path_vcf_patient $promoter_path $start $end
+sh ./runVariantProm.sh $name $full_output_path $input_path_vcf_patient $promoter_path $start $end $fast
 
 # run second script
 python3 summaryPromoterResults.py -i "$output_path_vcf" -p "$path_patient" -o "$output_path_summary"
