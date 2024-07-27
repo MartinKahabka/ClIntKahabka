@@ -146,10 +146,6 @@ def fastAnalyis_refac(input_file, result_file, prom, upstream, downstream):
         if line.isGene:
             rel_pos = line.compareGenePos(prom)
             
-            #print(str(start) + "||" + str(end))
-            #print(line.raw_data)
-            #print(prom)
-            #print(rel_pos)
             # gene has bigger position
             if rel_pos == -1:
                 start = index + 1
@@ -175,9 +171,6 @@ def fastAnalyis_refac(input_file, result_file, prom, upstream, downstream):
         
         result_file.write(lowest_line.raw_data)
         lowest_line = input_file.nextLine(lowest_line)
-        
-    
-    print("done")
 
 def sortGenePos(x1, x2):
     # get chr
