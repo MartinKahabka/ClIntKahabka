@@ -42,7 +42,6 @@ def add_conditions(dict_id, filename):
             # check for header line
             lab_id = content[2]
             condition = content[15]
-            print(lab_id)
             # check if lab id correlates to patient
             if lab_id != "Lab ID" and lab_id in id_and_condition:
                 dict_id[lab_id] = condition
