@@ -13,6 +13,7 @@ input_path=$3
 promoter_path=$4
 start=$5
 end=$6
+fast=$7
 
 # pattern matching for dna_vcf files
 pattern="*.vcf"
@@ -29,12 +30,21 @@ if [ ! -d "$full_output_path" ]; then
     mkdir -p "$full_output_path"
 fi
 
-for file in $files; do
-    full_input_path="$input_path/$file"
-    echo filename "$file"
-    # run script
-    python3 "variantPromoterRegion.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end"
-done
-# python3 variantPromoterRegion.py -n "alpha" -o "informationAndData/vcfsPromoter/" -v "informationAndData/test_vcf_file" -p informationAndData/GRCh37_promoterChrPos_testCopy.bed -s "500" -o "100"
+if [[ "$fast" == "true" ]]; then
+    for file in $files; do
+        full_input_path="$input_path/$file"
+        echo filename "$file"
+        # run script
+        python3 "variantPromoterRegion_refact.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end"
+    done
+else
+    for file in $files; do
+        full_input_path="$input_path/$file"
+        echo filename "$file"
+        # run script
+        python3 "variantPromoterRegion.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end"
+    done
+fi
+# python3 variantPromoterRegion.py -n "alpha" -o "informationAndData/vcfsPromoter/" -v "informationAndData/test_vcf_file" -p informationAndData/GRCh37_promoterChrPos_testCopy.bed -s "500" -e "100"
 
 echo "--- PROGRAMM FINISHED ---"
