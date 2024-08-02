@@ -15,7 +15,8 @@ class vcf_file:
         self.file.seek(0)
         while self.file.read(1) == '#':
             self.file.readline()
-        return self.file.tell()
+        
+        return self.file.tell() - 2
     
     def calculate_end_byte(self):
         offset = 1
@@ -32,7 +33,7 @@ class vcf_file:
             # go back to last linebreak
             self.file.seek(byte, 0)
             start_offset = 0
-            while self.file.read(1) != "\n":
+            while self.file.read(1) != "\n" and start_offset < byte:
                 start_offset += 1
                 self.file.seek(byte - start_offset)
         start_index = self.file.tell()
@@ -139,10 +140,14 @@ def fastAnalyis_refac(input_file, result_file, prom, upstream, downstream):
     # binary search
     start = input_file.start_byte
     end = input_file.end_byte
+    print("new run")
+    print(prom)
     while start < end:
         index = start + int((end - start) / 2)
         line = input_file.getLine(index)
 
+        #print(line.getStringLine())
+        #print(prom)
         if line.isGene:
             rel_pos = line.compareGenePos(prom)
             
@@ -160,15 +165,19 @@ def fastAnalyis_refac(input_file, result_file, prom, upstream, downstream):
     # search lowest line in promoter
     lowest_line = line
     previous_line = input_file.previousLine(lowest_line)
+    print(lowest_line.getStringLine())
+    print(previous_line.getStringLine())
+    print(previous_line.start_byte)
+    print(input_file.start_byte)
     # check if line lies in boundries of promoter and file
-    while previous_line.lineInPromoter(upstream, downstream, prom) == "in" and previous_line.start_byte >= input_file.start_byte:        
-        previous_line = input_file.previousLine(lowest_line)
+    while previous_line.start_byte >= input_file.start_byte and previous_line.lineInPromoter(upstream, downstream, prom) == "in":        
+        print("prev line: " + previous_line.getStringLine())
         lowest_line = previous_line
-    lowest_line = input_file.nextLine(lowest_line)
-    
+        previous_line = input_file.previousLine(lowest_line)
     # find all lines that lie in promoter
     while lowest_line.isGene and lowest_line.lineInPromoter(upstream, downstream, prom) == "in":
-        
+        print("checkpoint")
+        print(lowest_line.raw_data)
         result_file.write(lowest_line.raw_data)
         lowest_line = input_file.nextLine(lowest_line)
 
@@ -252,5 +261,5 @@ result_file.write("# Length Down/Upstream region of promoter TSS side: " + str(s
 for promoter in promoter_regions:
     fastAnalyis_refac(input_file, result_file, promoter, start_prom, end_prom)
 
-
+print("FILE SAVED TO: " + result_file.path)
 print("SUCCESS: PROGRAMM FINISHED")

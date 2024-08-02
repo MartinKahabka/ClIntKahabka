@@ -117,11 +117,12 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
             variant = (contain[0], int(contain[1]), contain[3], contain[4])
             # returns smaller, in or bigger. Relative pos of promoter to variant
             relPos = variantInBound(start_prom, end_prom, promoter_regions[pointer_promoter], variant)
-            # step to next promoter if current is downstream
-            if relPos == "smaller":
-                while variantInBound(start_prom, end_prom, promoter_regions[pointer_promoter], variant) == "smaller" and pointer_promoter+1 != len(promoter_regions):
-                    pointer_promoter += 1
             
+            # step to next promoters if current is downstream
+            while relPos == "smaller" and pointer_promoter+1 != len(promoter_regions):
+                pointer_promoter += 1
+                relPos = variantInBound(start_prom, end_prom, promoter_regions[pointer_promoter], variant)
+        
             if relPos == "in":
                 print("found vcf in promoter " + promoter_regions[pointer_promoter][2] + " on " + promoter_regions[pointer_promoter][0] + ", pos: " + str(contain[1]))
                 filter_vcfs_file.write(line)
