@@ -140,14 +140,11 @@ def fastAnalyis_refac(input_file, result_file, prom, upstream, downstream):
     # binary search
     start = input_file.start_byte
     end = input_file.end_byte
-    print("new run")
-    print(prom)
+    
     while start < end:
         index = start + int((end - start) / 2)
         line = input_file.getLine(index)
 
-        #print(line.getStringLine())
-        #print(prom)
         if line.isGene:
             rel_pos = line.compareGenePos(prom)
             
@@ -165,20 +162,17 @@ def fastAnalyis_refac(input_file, result_file, prom, upstream, downstream):
     # search lowest line in promoter
     lowest_line = line
     previous_line = input_file.previousLine(lowest_line)
-    print(lowest_line.getStringLine())
-    print(previous_line.getStringLine())
-    print(previous_line.start_byte)
-    print(input_file.start_byte)
     # check if line lies in boundries of promoter and file
     while previous_line.start_byte >= input_file.start_byte and previous_line.lineInPromoter(upstream, downstream, prom) == "in":        
-        print("prev line: " + previous_line.getStringLine())
         lowest_line = previous_line
         previous_line = input_file.previousLine(lowest_line)
     # find all lines that lie in promoter
+    previous_variants = set()
     while lowest_line.isGene and lowest_line.lineInPromoter(upstream, downstream, prom) == "in":
-        print("checkpoint")
-        print(lowest_line.raw_data)
-        result_file.write(lowest_line.raw_data)
+        if lowest_line.getGenePosition() not in previous_variants:
+            result_file.write(lowest_line.raw_data)
+            previous_variants.add(lowest_line.getGenePosition())
+            prom[3] += 1
         lowest_line = input_file.nextLine(lowest_line)
 
 def sortGenePos(x1, x2):
@@ -235,8 +229,9 @@ with open(promoter_path, 'r') as file:
             chrom = contain[0]
             pos = int(contain[1])
             name_prom = contain[3]
+            num_of_vars = 0
             # add to promoter regions
-            promoter_regions.append((chrom, pos, name_prom))
+            promoter_regions.append([chrom, pos, name_prom, num_of_vars])
             
 # sort in case promoter regions aren't sorted
 sorter = cmp_to_key(sortGenePos)

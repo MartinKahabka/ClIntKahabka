@@ -87,8 +87,9 @@ with open(promoter_path, 'r') as file:
             chrom = contain[0]
             pos = int(contain[1])
             name_prom = contain[3]
+            num_of_vars = 0
             # add to promoter regions
-            promoter_regions.append((chrom, pos, name_prom))
+            promoter_regions.append([chrom, pos, name_prom, num_of_vars])
             
 # sort in case promoter regions aren't sorted
 sorter = cmp_to_key(sortGenePos)
@@ -110,6 +111,7 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
     filter_vcfs_file.write("# Length Down/Upstream region of promoter TSS side: " + str(start_prom) + "/" + str(end_prom) + "\n")
     # keep pointer on promoter, due to sorted arrays in O(n), n : num Vcfs in vcf file
     pointer_promoter = 0
+    previous_variants = set()
     for line in vcf_file:
         if line[0] != '#' and line[0] != '\n':
             contain = line.split('\t')
@@ -123,8 +125,10 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
                 pointer_promoter += 1
                 relPos = variantInBound(start_prom, end_prom, promoter_regions[pointer_promoter], variant)
         
-            if relPos == "in":
+            if relPos == "in" and variant not in previous_variants:
                 print("found vcf in promoter " + promoter_regions[pointer_promoter][2] + " on " + promoter_regions[pointer_promoter][0] + ", pos: " + str(contain[1]))
+                previous_variants.add(variant)
+                promoter_regions[pointer_promoter][3] += 1
                 filter_vcfs_file.write(line)
-                
+
 print("SUCCESS: PROGRAMM FINISHED")
