@@ -27,7 +27,7 @@ full_output_path="$output_path/$name"
 output_path_vcf="$full_output_path/vcf_promoter_regions"
 output_path_summary="$full_output_path/summary_promoter.tsv"
 output_path_statistcal="$full_output_path/statistical_result.tsv"
-output_sum_path="$output_path/variants_per_promoter"
+output_sum_path="$full_output_path/variants_per_promoter"
 # create output_path
 if [ ! -d "$output_path" ]; then
     mkdir "$output_path"
