@@ -9,6 +9,7 @@ echo "promoter_path: $4"
 echo "start: $5"
 echo "end: $6"
 echo "fast $7"
+echo "output_promoter_path: $8"
 
 name=$1
 output_path=$2
@@ -17,6 +18,7 @@ promoter_path=$4
 start=$5
 end=$6
 fast=$7
+output_sum_path=$8
 
 # pattern matching for dna_vcf files
 pattern="*.vcf"
