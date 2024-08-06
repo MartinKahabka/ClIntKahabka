@@ -1,10 +1,6 @@
 import argparse
 import re
 import os
-# for each promoter: collect number of variants for severe and not severe
-    # get condition of patient
-    # get sum of promoter variants
-    # add sums to dict
     
 class promoter:
     def __init__(self, chrom, pos, name):
