@@ -68,6 +68,7 @@ parser.add_argument('-v', '--vcf_path',  help="path to the vcf file of the patie
 parser.add_argument('-p', '--path_promoters', help="path to the file with the promoter regions", required=False)
 parser.add_argument('-s', '--start', help="number of bases downstream of the promoter TSS that are considered promoter region", required=False)
 parser.add_argument('-e', '--end', help="number of bases upstream of the promoter TSS that are considered promoter region", required=False)
+parser.add_argument('-f', '--output_prom_path', help="output path for variant sum of promoter", required=False)
 
 args = parser.parse_args()
 
@@ -77,7 +78,7 @@ vcf_path = args.vcf_path
 promoter_path = args.path_promoters
 start_prom = int(args.start)
 end_prom = int(args.end)
-
+output_prom_path = args.output_prom_path
 
 # safe promoter regions as tuple (chromosome, position TSS)
 promoter_regions = []
@@ -104,6 +105,7 @@ print("--- SUCCESS ---")
 # name output file
 filename_vcf = os.path.basename(vcf_path)
 full_output_path = os.path.join(output_path, name + "_promoterVcfs_" + filename_vcf)
+full_sum_output_path = os.path.join(output_prom_path,  name + "_variantSum_" + filename_vcf)
 
 print("--- START LOOKING FOR VCFS IN PROMOTER REGIONS IN: " + vcf_path + " ---")
 # read in vcf of patient
@@ -137,9 +139,6 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
                 filter_vcfs_file.write(line)
                 
 # save sum of variants per promoter to file
-output_prom_path = "informationAndData/output_promoter/validate/variants_per_promoter"
-full_sum_output_path = os.path.join(output_prom_path,  name + "_variantSum_" + filename_vcf)
-
 with open(full_sum_output_path, "w") as promoter_sum_file:
     for promoter in promoter_regions:
         promoter_sum_file.write(promToString(promoter) +  '\n')

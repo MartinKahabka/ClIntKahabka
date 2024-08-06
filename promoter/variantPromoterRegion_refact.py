@@ -217,7 +217,7 @@ parser.add_argument('-v', '--vcf_path',  help="path to the vcf file of the patie
 parser.add_argument('-p', '--path_promoters', help="path to the file with the promoter regions", required=False)
 parser.add_argument('-s', '--start', help="number of bases downstream of the promoter TSS that are considered promoter region", required=False)
 parser.add_argument('-e', '--end', help="number of bases upstream of the promoter TSS that are considered promoter region", required=False)
-#parser.add_argument('-f', '--output_prom_path', help="output path for variant sum of promoter", required=False)
+parser.add_argument('-f', '--output_prom_path', help="output path for variant sum of promoter", required=False)
 
 args = parser.parse_args()
 
@@ -227,7 +227,7 @@ vcf_path = args.vcf_path
 promoter_path = args.path_promoters
 start_prom = int(args.start)
 end_prom = int(args.end)
-#output_prom_path = args.output_prom_path
+output_prom_path = args.output_prom_path
 
 
 # safe promoter regions as tuple (chromosome, position TSS)
@@ -253,9 +253,6 @@ promoter_regions.sort(key = sorter)
 print("--- SUCCESS ---")
 
 # name output file
-
-# REMOVE
-output_prom_path = "informationAndData/output_promoter/validate_fast/variants_per_promoter"
 
 filename_vcf = os.path.basename(vcf_path)
 full_vcf_output_path = os.path.join(output_path, name + "_promoterVcfs_" + filename_vcf)
