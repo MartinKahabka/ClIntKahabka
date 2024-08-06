@@ -147,7 +147,7 @@ def fastAnalyis_refac(input_file, result_file, prom_sum_file, prom, upstream, do
     end = input_file.end_byte
     
     # check if vcf file is not empty
-    if start > end:
+    if start < end:
         while start < end:
             index = start + int((end - start) / 2)
             line = input_file.getLine(index)
@@ -185,7 +185,7 @@ def fastAnalyis_refac(input_file, result_file, prom_sum_file, prom, upstream, do
             lowest_line = input_file.nextLine(lowest_line)
         
         # write promoter with sum of variant to output file
-        prom_sum_file.write(promToString(prom) + '\n')
+    prom_sum_file.write(promToString(prom) + '\n')
 
 def sortGenePos(x1, x2):
     # get chr
