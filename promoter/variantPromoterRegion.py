@@ -52,6 +52,11 @@ def variantInBound(start, end, prom, variant) -> str:
             return "bigger" if relPos == 1 else "smaller"
     else:
         return "bigger" if relPos == 1 else "smaller"
+    
+# prom of type [chrom, int(pos), name_prom, int(num_of_vars)]
+def promToString(prom):
+    prom_as_string = [str(i) for i in prom]
+    return '\t'.join(prom_as_string)
 
 print("--- START PROGRAMM VARIANTPROMOTERREGION.PY ---")
 
@@ -130,5 +135,13 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
                 previous_variants.add(variant)
                 promoter_regions[pointer_promoter][3] += 1
                 filter_vcfs_file.write(line)
+                
+# save sum of variants per promoter to file
+output_prom_path = "informationAndData/output_promoter/validate/variants_per_promoter"
+full_sum_output_path = os.path.join(output_prom_path,  name + "_variantSum_" + filename_vcf)
+
+with open(full_sum_output_path, "w") as promoter_sum_file:
+    for promoter in promoter_regions:
+        promoter_sum_file.write(promToString(promoter) +  '\n')
 
 print("SUCCESS: PROGRAMM FINISHED")
