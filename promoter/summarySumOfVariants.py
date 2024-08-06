@@ -1,6 +1,7 @@
 import argparse
 import re
 import os
+
     
 class promoter:
     def __init__(self, chrom, pos, name):
@@ -17,11 +18,11 @@ class promoter:
             self.notSevereCov.append(num)
             
     def promoterToString(self):
-        header = "\t".join([self.chr, self.pos, self.name])
+        sum_variants_severe = str(sum([int(i) for i in self.severeCov]))
+        sum_variants_not = str(sum([int(i) for i in self.notSevereCov]))
+        header = "\t".join([self.chr, self.pos, self.name, sum_variants_severe, sum_variants_not])
         pos = "\t".join(self.severeCov)
         neg = "\t".join(self.notSevereCov)
-        print(self.severeCov)
-        print(repr(pos))
         return "\n".join([header, pos, neg])
         
 # gets a string and a regex pattern that describes the unique ID of the patient
@@ -64,16 +65,14 @@ args = parser.parse_args()
 # get parameters
 input_path = args.input_dir
 info_file_path = args.patient_info
-output_file_path = args.output_dir
+path_to_output_file = args.output_dir
 
 pattern = r"FO\d*x\d*"
-name_output_file = "summary_sum_variants.tsv"
-path_to_output_file = os.path.join(output_file_path, name_output_file)
 
 # print args
 print(input_path)
 print(info_file_path)
-print(output_file_path)
+print(path_to_output_file)
 
 
 # get IDs of patients
