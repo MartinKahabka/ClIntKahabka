@@ -9,6 +9,7 @@ echo "promoter_path: $4"
 echo "start: $5"
 echo "end: $6"
 echo "fast $7"
+echo "output_promoter_path: $8"
 
 name=$1
 output_path=$2
@@ -17,6 +18,7 @@ promoter_path=$4
 start=$5
 end=$6
 fast=$7
+output_sum_path=$8
 
 # pattern matching for dna_vcf files
 pattern="*.vcf"
@@ -38,14 +40,14 @@ if [[ "$fast" == "true" ]]; then
     full_input_path="$input_path/$file"
     echo filename "$file"
     # run script
-    python3 "variantPromoterRegion_refact.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end"
+    python3 "variantPromoterRegion_refact.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end" -f "$output_sum_path"
     done
 else
     for file in $files; do
         full_input_path="$input_path/$file"
         echo filename "$file"
         # run script
-        python3 "variantPromoterRegion.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end"
+        python3 "variantPromoterRegion.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end" -f "$output_sum_path"
     done
 fi
 # python3 variantPromoterRegion.py -n "alpha" -o "informationAndData/vcfsPromoter/" -v "informationAndData/test_vcf_file" -p informationAndData/GRCh37_promoterChrPos_testCopy.bed -s "500" -e "100"

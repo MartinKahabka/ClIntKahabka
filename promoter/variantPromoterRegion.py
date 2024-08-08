@@ -52,6 +52,11 @@ def variantInBound(start, end, prom, variant) -> str:
             return "bigger" if relPos == 1 else "smaller"
     else:
         return "bigger" if relPos == 1 else "smaller"
+    
+# prom of type [chrom, int(pos), name_prom, int(num_of_vars)]
+def promToString(prom):
+    prom_as_string = [str(i) for i in prom]
+    return '\t'.join(prom_as_string)
 
 print("--- START PROGRAMM VARIANTPROMOTERREGION.PY ---")
 
@@ -63,6 +68,7 @@ parser.add_argument('-v', '--vcf_path',  help="path to the vcf file of the patie
 parser.add_argument('-p', '--path_promoters', help="path to the file with the promoter regions", required=False)
 parser.add_argument('-s', '--start', help="number of bases downstream of the promoter TSS that are considered promoter region", required=False)
 parser.add_argument('-e', '--end', help="number of bases upstream of the promoter TSS that are considered promoter region", required=False)
+parser.add_argument('-f', '--output_prom_path', help="output path for variant sum of promoter", required=False)
 
 args = parser.parse_args()
 
@@ -72,7 +78,7 @@ vcf_path = args.vcf_path
 promoter_path = args.path_promoters
 start_prom = int(args.start)
 end_prom = int(args.end)
-
+output_prom_path = args.output_prom_path
 
 # safe promoter regions as tuple (chromosome, position TSS)
 promoter_regions = []
@@ -87,8 +93,9 @@ with open(promoter_path, 'r') as file:
             chrom = contain[0]
             pos = int(contain[1])
             name_prom = contain[3]
+            num_of_vars = 0
             # add to promoter regions
-            promoter_regions.append((chrom, pos, name_prom))
+            promoter_regions.append([chrom, pos, name_prom, num_of_vars])
             
 # sort in case promoter regions aren't sorted
 sorter = cmp_to_key(sortGenePos)
@@ -98,6 +105,7 @@ print("--- SUCCESS ---")
 # name output file
 filename_vcf = os.path.basename(vcf_path)
 full_output_path = os.path.join(output_path, name + "_promoterVcfs_" + filename_vcf)
+full_sum_output_path = os.path.join(output_prom_path,  name + "_variantSum_" + filename_vcf)
 
 print("--- START LOOKING FOR VCFS IN PROMOTER REGIONS IN: " + vcf_path + " ---")
 # read in vcf of patient
@@ -110,6 +118,7 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
     filter_vcfs_file.write("# Length Down/Upstream region of promoter TSS side: " + str(start_prom) + "/" + str(end_prom) + "\n")
     # keep pointer on promoter, due to sorted arrays in O(n), n : num Vcfs in vcf file
     pointer_promoter = 0
+    previous_variants = set()
     for line in vcf_file:
         if line[0] != '#' and line[0] != '\n':
             contain = line.split('\t')
@@ -123,8 +132,15 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
                 pointer_promoter += 1
                 relPos = variantInBound(start_prom, end_prom, promoter_regions[pointer_promoter], variant)
         
-            if relPos == "in":
+            if relPos == "in" and variant not in previous_variants:
                 print("found vcf in promoter " + promoter_regions[pointer_promoter][2] + " on " + promoter_regions[pointer_promoter][0] + ", pos: " + str(contain[1]))
+                previous_variants.add(variant)
+                promoter_regions[pointer_promoter][3] += 1
                 filter_vcfs_file.write(line)
                 
+# save sum of variants per promoter to file
+with open(full_sum_output_path, "w") as promoter_sum_file:
+    for promoter in promoter_regions:
+        promoter_sum_file.write(promToString(promoter) +  '\n')
+
 print("SUCCESS: PROGRAMM FINISHED")
