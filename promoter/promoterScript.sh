@@ -38,6 +38,7 @@ output_path_sum="$full_output_path/summary_sum_variants.tsv"
 
 # part of output in third part
 output_path_statistcal="$full_output_path/statistical_result.tsv"
+output_path_statistcal="$full_output_path/statistical_sum_variant_result.tsv"
 
 # check and create necessary output folder
 if [ ! -d "$output_path" ]; then
@@ -66,4 +67,5 @@ python3 summarySumOfVariants.py -i "$output_sum_path" -p "$path_patient" -o "$ou
 
 # run third part
 Rscript statisticalAnalysisPromoter.R "$output_path_summary" "$output_path_statistcal"
+Rscript statisticalAnalysisSum.R "$output_path_sum" "$output_path_statistcal"
 
