@@ -1,5 +1,5 @@
 # author: Martin Kahabka
-print("--- START PROGRAMM STATISTICALANALYSISSUM")
+print("--- START PROGRAMM STATISTICALANALYSISSUM.R")
 tryCatch({
   library(tzdb, lib.loc = "./rLibs")
   library(readr, lib.loc = "./rLibs")
@@ -68,7 +68,6 @@ results_analysis <- data.frame(
 colnames(results_analysis) <- col_result
 
 # write out output file
-print(results_analysis)
 write_tsv(results_analysis, path = output_path)
 
 
