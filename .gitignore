@@ -23,6 +23,7 @@
 /promoter/utils/.DS_store
 /promoter/informationAndData/.DS_store
 /promoter/informationAndData/
+promoter/informationAndData/GRCh37_promoterChrPos.bed
 /promoter/output_summary/
 /promoter/output_statistical_analysis/
 /promoter/.nextflow/
