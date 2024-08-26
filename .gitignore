@@ -32,3 +32,4 @@
 /promoter/.vscode
 /promoter/simulateInput.py
 /promoter/.venv/
+promoter/informationAndData/GRCh37_promoterChrPos.bed
