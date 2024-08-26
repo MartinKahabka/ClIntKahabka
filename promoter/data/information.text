@@ -1,16 +1,21 @@
 Enhancer Atlas
-File of enhancer for PMBC-Cells with known enhancer gene interactions
-"A:B-C_D$E$F$G$H	I":
-A - Chromosome of enhancer.
-B - The starting position of enhancer.
-C - The ending position of enhancer.
-D - Gene ensembl ID.
-E - Gene ensembl Name.
-F - chromosome of gene.
-G - the position of the gene transcription start site.
-H - The strand of DNA the gene located.
-I - The predition score of the enhancer-gene interaction.
+    File of enhancer for PMBC-Cells with known enhancer gene interactions
+    "A:B-C_D$E$F$G$H	I":
+    A - Chromosome of enhancer.
+    B - The starting position of enhancer.
+    C - The ending position of enhancer.
+    D - Gene ensembl ID.
+    E - Gene ensembl Name.
+    F - chromosome of gene.
+    G - the position of the gene transcription start site.
+    H - The strand of DNA the gene located.
+    I - The predition score of the enhancer-gene interaction.
 
-reference genome: hg19 (source paper EnhancerAtlas 2.0)
+    reference genome: hg19 (source paper EnhancerAtlas 2.0)
 
-=> Enhancer for PMBC-cells without known enhancer gene interactions contains much more enhancer
+    => Enhancer for PMBC-cells without known enhancer gene interactions contains much more enhancer
+
+EPDNew
+    File of promoter regions by gene
+
+    refenerce genome: hg19
