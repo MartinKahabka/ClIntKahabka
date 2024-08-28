@@ -35,7 +35,7 @@ if [ ! -d "$full_output_path" ]; then
     mkdir -p "$full_output_path"
 fi
 
-if [[ "$fast" == "true" ]]; then
+if $fast == "true"; then
     for file in $files; do
     full_input_path="$input_path/$file"
     echo filename "$file"
