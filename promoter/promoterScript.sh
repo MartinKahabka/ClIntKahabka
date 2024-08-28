@@ -1,42 +1,42 @@
-# folder structure
-# output_promoter/name1/vcf_promoter_regions/...
-# output_promoter/name1/summary
-# output_promoter/name1/statistical
-#               ./name2
 #!/bin/bash -v 3.2  # Use version 3.2
 
 echo "name: $1"
 echo "output_path: $2"
 echo "input_path_vcf_patient: $3"
-echo "promoter_path: $4"
-echo "start: $5"
-echo "end: $6"
-echo "path_patient_info: $7"
-echo "fast: $8"
-echo "mode: $9"
+echo "gene_names: $4"
+echo "database: $5"
+echo "start: $6"
+echo "end: $7"
+echo "path_patient_info: $8"
+echo "fast: $9"
+echo "mode: $10"
 
 name=$1
 output_path=$2
 input_path_vcf_patient=$3
-promoter_path=$4
-start=$5
-end=$6
-path_patient=$7
-fast=$8
-mode=$9
+gene_names=$4
+database=$5
+start=$6
+end=$7
+path_patient=$8
+fast=$9
+mode=$10
 
 # path of output folder
 full_output_path="$output_path/$name"
 
-# path of output in first part
+# path from filter
+output_path_filtered="$full_output_path/regionsOfInterest.bed"
+
+# path of output in variant promoter
 output_path_vcf="$full_output_path/vcf_promoter_regions"
 output_sum_path="$full_output_path/variants_per_promoter"
 
-# part of output in second part
+# part of output in summary for result
 output_path_summary="$full_output_path/summary_promoter.tsv"
 output_path_sum="$full_output_path/summary_sum_variants.tsv"
 
-# part of output in third part
+# part of output in statistical analysis
 output_path_statistcal="$full_output_path/statistical_result.tsv"
 output_path_statistcal="$full_output_path/statistical_sum_variant_result.tsv"
 
@@ -57,15 +57,18 @@ if [ ! -d "$output_sum_path" ]; then
     mkdir -p "$output_sum_path"
 fi
 
-# run first part
-sh ./runVariantProm.sh $name $full_output_path $input_path_vcf_patient $promoter_path $start $end $fast $output_sum_path
+# filter from database
+python3 regionOfInterestFilter.py -d "$database" -g "$gene_names" -o "$output_path_filtered"
 
-# run second part
+# run variant promoter
+sh ./runVariantProm.sh $name $full_output_path $input_path_vcf_patient $output_path_filtered $start $end $fast $output_sum_path
+
+# summary for result 
 python3 summaryPromoterResults.py -i "$output_path_vcf" -p "$path_patient" -o "$output_path_summary"
 python3 summarySumOfVariants.py -i "$output_sum_path" -p "$path_patient" -o "$output_path_sum"
 
 
-# run third part
+# statistical analysis
 Rscript statisticalAnalysisPromoter.R "$output_path_summary" "$output_path_statistcal"
 Rscript statisticalAnalysisSum.R "$output_path_sum" "$output_path_statistcal"
 
