@@ -1,5 +1,5 @@
 # author martin kahabka
-# use filters regions of interest from database (.bed) based on selection of gene names
+# use: filters regions of interest from database (.bed) based on selection of gene names
 import argparse
 
 # input: name of region (promoter/enhancer/silencer name)
