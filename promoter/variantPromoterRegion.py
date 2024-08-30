@@ -1,9 +1,19 @@
+# author martin kahabka
+# use: 
 import argparse
 from functools import cmp_to_key
 import os
 
 # run with comment
 #python3
+
+"""
+Converts a string identifier of a chromosome to and integer. 
+Converts X, Y and MT string to numbers 23-25
+
+@param chrom: string identifier of chromosome
+@return: integer identifier of chromosome
+"""
 
 def chrToNumber(chrom):
     rest = chrom[3:]
@@ -16,6 +26,15 @@ def chrToNumber(chrom):
     else:
         return int(rest)
 
+"""
+Compares the position of two genome positions (chromosome and position) over the whole genome.
+
+@param x1: first gene to compare
+@param x2: second gene to compare
+@return: 1 if x1 is bigger that x2
+         2 if x1 is lower that x2
+         0 else
+"""
 def sortGenePos(x1, x2):
     # get chr
     chr1 = chrToNumber(x1[0])
