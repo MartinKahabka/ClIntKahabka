@@ -6,6 +6,31 @@ import os
 
 # run with comment
 #python3
+class Region:
+    def __init__(self, c, p):
+        self.chrom = c
+        self.pos = p
+    
+        
+class Variant(Region):
+    def __init__(self, c, p, l):
+        super().__init__(c, p)
+        self.line_content = l
+    
+    """
+    returns unique identifier for variant
+    """
+    def identifier(self):
+        return self.chrom + " " + self.pos
+
+class Promoter(Region):
+    def __init__(self, c, p, l, n, num):
+        super().__init__(c, p)
+        self.line_content = l
+        self.name = n
+        self.num_variants = num
+    
+
 
 """
 Converts a string identifier of a chromosome to and integer. 
@@ -29,16 +54,16 @@ def chrToNumber(chrom):
 """
 Compares the position of two genome positions (chromosome and position) over the whole genome.
 
-@param x1: first gene to compare
-@param x2: second gene to compare
+@param x1: Region: first gene to compare
+@param x2: Region: second gene to compare
 @return: 1 if x1 is bigger that x2
          2 if x1 is lower that x2
          0 else
 """
-def sortGenePos(x1, x2):
+def sortGenePos(x1 : Region, x2 : Region):
     # get chr
-    chr1 = chrToNumber(x1[0])
-    chr2 = chrToNumber(x2[0])
+    chr1 = chrToNumber(x1.chrom)
+    chr2 = chrToNumber(x2.chrom)
     # lower chromosome, less big
     if chr1 < chr2:
         return -1
@@ -46,8 +71,8 @@ def sortGenePos(x1, x2):
         return 1
     # same chromosome
     else:
-        pos1 = x1[1]
-        pos2 = x2[1]
+        pos1 = x1.pos
+        pos2 = x2.pos
         if pos1 < pos2:
             return -1
         elif pos1 > pos2:
@@ -58,10 +83,10 @@ def sortGenePos(x1, x2):
 def variantInBound(start, end, prom, variant) -> str:
     # -1 if promoter is downstream of variant, 1 if otherwise, 0 else
     relPos = sortGenePos(prom, variant)
-    promPos = prom[1]
-    variantPos = variant[1]
+    promPos = prom.pos
+    variantPos = variant.pos
     # check if chromosoms are equal
-    if chrToNumber(prom[0]) == chrToNumber(variant[0]): 
+    if chrToNumber(prom.chrom) == chrToNumber(variant.chrom): 
         # define bound and check
         downBound = promPos - start
         upBound = promPos +  end
@@ -76,6 +101,25 @@ def variantInBound(start, end, prom, variant) -> str:
 def promToString(prom):
     prom_as_string = [str(i) for i in prom]
     return '\t'.join(prom_as_string)
+
+"""
+Returns the comment for the output file
+
+@param path: full output path to file
+@param n: name of process
+@param vcf_p: path of .vcf file of patient
+@param promoter_p: path to promoter file
+@param start: range downstream of TSS
+@param end: range upstream of TSS
+@return: concatentation of output informations as string 
+"""
+def write_output_comment(path, n, vcf_p, promoter_p, start, end):
+    c = "# Name of file: " + path + "\n"
+    c += "# Name of process: " + n + "\n"
+    c += "# Patient vcf file path: " + vcf_p + "\n"
+    c += "# Promoter region file path:" + promoter_p + "\n"
+    c += "# Length Down/Upstream region of promoter TSS side: " + str(start) + "/" + str(end) + "\n"
+    return c
 
 print("--- START PROGRAMM VARIANTPROMOTERREGION.PY ---")
 
@@ -114,7 +158,8 @@ with open(promoter_path, 'r') as file:
             name_prom = contain[3]
             num_of_vars = 0
             # add to promoter regions
-            promoter_regions.append([chrom, pos, name_prom, num_of_vars])
+            p = Promoter(chrom, pos, line, name_prom, num_of_vars)
+            promoter_regions.append(p)
             
 # sort in case promoter regions aren't sorted
 sorter = cmp_to_key(sortGenePos)
@@ -130,32 +175,38 @@ print("--- START LOOKING FOR VCFS IN PROMOTER REGIONS IN: " + vcf_path + " ---")
 # read in vcf of patient
 with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs_file:
     # write information into promoter vcf file
-    filter_vcfs_file.write("# Name of file: " + os.path.basename(full_output_path) + "\n")
-    filter_vcfs_file.write("# Name of process: " + name + "\n")
-    filter_vcfs_file.write("# Patient vcf file path: " + vcf_path + "\n")
-    filter_vcfs_file.write("# Promoter region file path:" + promoter_path + "\n")
-    filter_vcfs_file.write("# Length Down/Upstream region of promoter TSS side: " + str(start_prom) + "/" + str(end_prom) + "\n")
+    filter_vcfs_file.write(write_output_comment(os.path.basename(full_output_path), name, vcf_path, promoter_path, start_prom, end_prom))
+    
     # keep pointer on promoter, due to sorted arrays in O(n), n : num Vcfs in vcf file
     pointer_promoter = 0
     previous_variants = set()
     for line in vcf_file:
         if line[0] != '#' and line[0] != '\n':
             contain = line.split('\t')
-            # (chromosome, position, ref, alt)
-            variant = (contain[0], int(contain[1]), contain[3], contain[4])
-            # returns smaller, in or bigger. Relative pos of promoter to variant
-            relPos = variantInBound(start_prom, end_prom, promoter_regions[pointer_promoter], variant)
             
-            # step to next promoters if current is downstream
+            # define variant/promoter
+            variant = Variant(contain[0], int(contain[1]), contain[3], contain[4])
+            current_promoter = promoter_regions[pointer_promoter]
+            
+            # returns smaller, in or bigger. Relative pos of promoter to variant
+            relPos = variantInBound(start_prom, end_prom, current_promoter, variant)
+            
+            # get current promoter
             while relPos == "smaller" and pointer_promoter+1 != len(promoter_regions):
+                # variant is upstream/higher chrom that promoter, step to next
                 pointer_promoter += 1
                 relPos = variantInBound(start_prom, end_prom, promoter_regions[pointer_promoter], variant)
+                
+            # update promoter
+            current_promoter = promoter_regions[pointer_promoter]
         
             if relPos == "in" and variant not in previous_variants:
-                print("found vcf in promoter " + promoter_regions[pointer_promoter][2] + " on " + promoter_regions[pointer_promoter][0] + ", pos: " + str(contain[1]))
-                previous_variants.add(variant)
-                promoter_regions[pointer_promoter][3] += 1
-                filter_vcfs_file.write(line)
+                print("found vcf in promoter " + current_promoter.name + " on " + variant.chrom + ", pos: " + str(variant.pos))
+                # write to file
+                filter_vcfs_file.write(variant.line_content)
+                # update counter and add to known variants to void copies
+                previous_variants.add(variant.identifier())
+                current_promoter.num_variants += 1
                 
 # save sum of variants per promoter to file
 with open(full_sum_output_path, "w") as promoter_sum_file:
