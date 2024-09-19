@@ -1,5 +1,7 @@
 # author martin kahabka
-# use: 
+# use: based on a list of variants and list of promoter. Every variant that is not in range of a promoter is filtered out.
+#      The variants within a promoter are saved in a file
+#      Also counts the number of variants per promoter and saves them in a file
 import argparse
 from functools import cmp_to_key
 import os
@@ -17,10 +19,10 @@ class Variant(Region):
         super().__init__(c, p)
         self.line_content = l
     
-    """
-    returns unique identifier for variant
-    """
     def identifier(self):
+        """
+        returns unique identifier for variant
+        """
         return self.chrom + " " + self.pos
 
 class Promoter(Region):
@@ -30,7 +32,9 @@ class Promoter(Region):
         self.name = n
         self.num_variants = num
     
-
+    def promToString(self):
+        prom_as_array = [self.c, self.p, self.n, self.num]
+        return '\t'.join(prom_as_array)
 
 """
 Converts a string identifier of a chromosome to and integer. 
@@ -40,7 +44,16 @@ Converts X, Y and MT string to numbers 23-25
 @return: integer identifier of chromosome
 """
 
-def chrToNumber(chrom):
+def chrToNumber(chrom : str):
+    """ Converts a string identifier of a chromosome to and integer. \n
+        Converts X, Y and MT string to numbers 23-25
+
+    Args:
+        chrom (string): string identifier of chromosome
+
+    Returns:
+        integer: integer identifier of chromosome
+    """
     rest = chrom[3:]
     if rest == 'X':
         return 23
@@ -51,16 +64,18 @@ def chrToNumber(chrom):
     else:
         return int(rest)
 
-"""
-Compares the position of two genome positions (chromosome and position) over the whole genome.
-
-@param x1: Region: first gene to compare
-@param x2: Region: second gene to compare
-@return: 1 if x1 is bigger that x2
-         2 if x1 is lower that x2
-         0 else
-"""
 def sortGenePos(x1 : Region, x2 : Region):
+    """ Compares the position of two genome positions (chromosome and position) over the whole genome.
+
+    Args:
+        x1 (Region): first region to compare
+        x2 (Region): second region to compar
+
+    Returns:
+        integer: 1 if x1 is bigger that x2 \n
+                 -1 if x1 is lower that x2 \n
+                 0 else
+    """
     # get chr
     chr1 = chrToNumber(x1.chrom)
     chr2 = chrToNumber(x2.chrom)
@@ -80,8 +95,22 @@ def sortGenePos(x1 : Region, x2 : Region):
     # pos are exactly the same
     return 0
 
-def variantInBound(start, end, prom, variant) -> str:
-    # -1 if promoter is downstream of variant, 1 if otherwise, 0 else
+def variantInBound(start : int, end : int, prom : Region, variant : Region) -> str:
+    """ Compares the range of a given promoter to the position of a variant 
+        and returns whether the variant is in, below or above the promoter
+
+    Args:
+        start (integer): lower bound of promoter (upstream)
+        end (integer): upper bound of promoter (downstream)
+        prom (Region): 
+        variant (Region): _description_
+
+    Returns:
+        str: "bigger" if promoter range is higher that variant \n
+             "smaller" if promoter range is lower that variant \n
+             "in" if variant is in promoter range
+    """
+    # 1 if promoter is bigger that variant, -1 if otherwise, 0 else
     relPos = sortGenePos(prom, variant)
     promPos = prom.pos
     variantPos = variant.pos
@@ -97,23 +126,20 @@ def variantInBound(start, end, prom, variant) -> str:
     else:
         return "bigger" if relPos == 1 else "smaller"
     
-# prom of type [chrom, int(pos), name_prom, int(num_of_vars)]
-def promToString(prom):
-    prom_as_string = [str(i) for i in prom]
-    return '\t'.join(prom_as_string)
-
-"""
-Returns the comment for the output file
-
-@param path: full output path to file
-@param n: name of process
-@param vcf_p: path of .vcf file of patient
-@param promoter_p: path to promoter file
-@param start: range downstream of TSS
-@param end: range upstream of TSS
-@return: concatentation of output informations as string 
-"""
 def write_output_comment(path, n, vcf_p, promoter_p, start, end):
+    """ Returns the comment for the output file
+
+    Args:
+        path (string): full output path to file
+        n (string): name of process
+        vcf_p (string): path of .vcf file of patient
+        promoter_p (string): path to promoter file
+        start (integer): range downstream of TSS
+        end (integer): range upstream of TSS
+
+    Returns:
+        string: concatentation informations used as comment for output file
+    """
     c = "# Name of file: " + path + "\n"
     c += "# Name of process: " + n + "\n"
     c += "# Patient vcf file path: " + vcf_p + "\n"
@@ -121,10 +147,33 @@ def write_output_comment(path, n, vcf_p, promoter_p, start, end):
     c += "# Length Down/Upstream region of promoter TSS side: " + str(start) + "/" + str(end) + "\n"
     return c
 
+def readInPromoter(prom_path: str):
+    """ Read in file and returns list of promoters from this file
+
+    Args:
+        prom_path (string): Path to file with promoters 
+
+    Returns:
+        array[Promoter]: Array containing the promoters
+    """
+    with open(prom_path, 'r') as file:
+        # get promoters regions of all promoters
+        for line in file:
+            if line[0] != '#':
+                contain = line.split('\t')
+                chrom = contain[0]
+                pos = int(contain[1])
+                name_prom = contain[3]
+                num_of_vars = 0
+                # add to promoter regions
+                p = Promoter(chrom, pos, line, name_prom, num_of_vars)
+                promoter_regions.append(p)
+    return promoter_regions
+
 print("--- START PROGRAMM VARIANTPROMOTERREGION.PY ---")
 
+# arguments of running the code
 parser = argparse.ArgumentParser(prog='variantPromoterRegion.py', description='Description of your script')
-
 parser.add_argument('-n', '--name_process', help="one unique identifer of the process", required=False)
 parser.add_argument('-o', '--output_dir',  help="where the output should be saved", required=False)
 parser.add_argument('-v', '--vcf_path',  help="path to the vcf file of the patient", required=False)
@@ -133,8 +182,8 @@ parser.add_argument('-s', '--start', help="number of bases downstream of the pro
 parser.add_argument('-e', '--end', help="number of bases upstream of the promoter TSS that are considered promoter region", required=False)
 parser.add_argument('-f', '--output_prom_path', help="output path for variant sum of promoter", required=False)
 
+# parse arguments to vars
 args = parser.parse_args()
-
 name = args.name_process
 output_path = args.output_dir
 vcf_path = args.vcf_path
@@ -143,23 +192,10 @@ start_prom = int(args.start)
 end_prom = int(args.end)
 output_prom_path = args.output_prom_path
 
-# safe promoter regions as tuple (chromosome, position TSS)
-promoter_regions = []
-
-# read in promoter regions
+# read in promoter regions for file as promoter classes
 print("--- READ IN PROMOTER FILE ---")
-with open(promoter_path, 'r') as file:
-    # get promoters regions of all promoters
-    for line in file:
-        if line[0] != '#':
-            contain = line.split('\t')
-            chrom = contain[0]
-            pos = int(contain[1])
-            name_prom = contain[3]
-            num_of_vars = 0
-            # add to promoter regions
-            p = Promoter(chrom, pos, line, name_prom, num_of_vars)
-            promoter_regions.append(p)
+promoter_regions = readInPromoter(promoter_path)
+
             
 # sort in case promoter regions aren't sorted
 sorter = cmp_to_key(sortGenePos)
@@ -211,6 +247,6 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
 # save sum of variants per promoter to file
 with open(full_sum_output_path, "w") as promoter_sum_file:
     for promoter in promoter_regions:
-        promoter_sum_file.write(promToString(promoter) +  '\n')
+        promoter_sum_file.write(promoter.promToString() + "\n")
 
 print("SUCCESS: PROGRAMM FINISHED")
