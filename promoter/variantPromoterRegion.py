@@ -6,8 +6,6 @@ import argparse
 from functools import cmp_to_key
 import os
 
-# run with comment
-#python3
 class Region:
     def __init__(self, c, p):
         self.chrom = c
