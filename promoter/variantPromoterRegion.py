@@ -1,6 +1,6 @@
 # author martin kahabka
 # use: based on a list of variants and list of promoter. Every variant that is not in range of a promoter is filtered out.
-#      The variants within a promoter are saved in a file
+#      The variants within a promoter are saved in a file. Uses linear algorithm.
 #      Also counts the number of variants per promoter and saves them in a file
 import argparse
 from functools import cmp_to_key
