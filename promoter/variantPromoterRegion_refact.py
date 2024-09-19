@@ -141,7 +141,7 @@ def getCommand(output_path, name, vcf_path, promoter_path, start, end) -> str:
     command += "# Length Down/Upstream region of promoter TSS side: " + str(start) + "/" + str(end) + "\n"
     return command
 
-def fastAnalyis_refac(input_file, result_file, prom_sum_file, prom, upstream, downstream):
+def fastAnalyis_refac(input_file, result_file, prom_sum_file, prom, upstream, downstream, prev_vars):
     # binary search
     start = input_file.start_byte
     end = input_file.end_byte
@@ -151,7 +151,6 @@ def fastAnalyis_refac(input_file, result_file, prom_sum_file, prom, upstream, do
         while start < end:
             index = start + int((end - start) / 2)
             line = input_file.getLine(index)
-
             if line.isGene:
                 rel_pos = line.compareGenePos(prom)
                 
@@ -169,23 +168,29 @@ def fastAnalyis_refac(input_file, result_file, prom_sum_file, prom, upstream, do
         # search lowest line in promoter
         lowest_line = line
         previous_line = input_file.previousLine(lowest_line)
-        
+
         # get most upstream variant in boundary of promoter
         while previous_line.start_byte >= input_file.start_byte and previous_line.lineInPromoter(upstream, downstream, prom) == "in":        
             lowest_line = previous_line
             previous_line = input_file.previousLine(lowest_line)
         
+        # check for edge case
+        if lowest_line.lineInPromoter(upstream, downstream, prom) != "in":
+            lowest_line = input_file.nextLine(lowest_line)
+        
         # search downstream for variants in promoter
-        previous_variants = set()
         while lowest_line.isGene and lowest_line.lineInPromoter(upstream, downstream, prom) == "in":
-            if lowest_line.getGenePosition() not in previous_variants:
+            if lowest_line.getGenePosition() not in prev_vars:
                 result_file.write(lowest_line.raw_data)
-                previous_variants.add(lowest_line.getGenePosition())
-                prom[3] += 1
+                prev_vars.add(lowest_line.getGenePosition())
+            
+            prom[3] += 1
             lowest_line = input_file.nextLine(lowest_line)
         
         # write promoter with sum of variant to output file
     prom_sum_file.write(promToString(prom) + '\n')
+    
+    return prev_vars
 
 def sortGenePos(x1, x2):
     # get chr
@@ -271,8 +276,9 @@ filtered_vcf_file.write("# Patient vcf file path: " + vcf_path + "\n")
 filtered_vcf_file.write("# Promoter region file path:" + promoter_path + "\n")
 filtered_vcf_file.write("# Length Down/Upstream region of promoter TSS side: " + str(start_prom) + "/" + str(end_prom) + "\n")
 
+previous_variants = set()
 for promoter in promoter_regions:
-    fastAnalyis_refac(input_file, filtered_vcf_file, promoter_sum_file, promoter, start_prom, end_prom)
+    previous_variants = fastAnalyis_refac(input_file, filtered_vcf_file, promoter_sum_file, promoter, start_prom, end_prom, previous_variants)
 
 print("FILE SAVED TO: " + filtered_vcf_file.path)
 print("SUCCESS: PROGRAMM FINISHED")
