@@ -23,7 +23,7 @@ class Variant(Region):
         """
         returns unique identifier for variant
         """
-        return self.chrom + " " + self.pos
+        return self.chrom + " " + str(self.pos)
 
 class Promoter(Region):
     def __init__(self, c, p, l, n, num):
@@ -33,7 +33,7 @@ class Promoter(Region):
         self.num_variants = num
     
     def promToString(self):
-        prom_as_array = [self.c, self.p, self.n, self.num]
+        prom_as_array = [self.chrom, str(self.pos), self.name, str(self.num_variants)]
         return '\t'.join(prom_as_array)
 
 """
@@ -158,6 +158,7 @@ def readInPromoter(prom_path: str):
     """
     with open(prom_path, 'r') as file:
         # get promoters regions of all promoters
+        promoter_regions = []
         for line in file:
             if line[0] != '#':
                 contain = line.split('\t')
@@ -221,7 +222,7 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
             contain = line.split('\t')
             
             # define variant/promoter
-            variant = Variant(contain[0], int(contain[1]), contain[3], contain[4])
+            variant = Variant(contain[0], int(contain[1]), line)
             current_promoter = promoter_regions[pointer_promoter]
             
             # returns smaller, in or bigger. Relative pos of promoter to variant
@@ -236,7 +237,7 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
             # update promoter
             current_promoter = promoter_regions[pointer_promoter]
         
-            if relPos == "in" and variant not in previous_variants:
+            if relPos == "in" and variant.identifier() not in previous_variants:
                 print("found vcf in promoter " + current_promoter.name + " on " + variant.chrom + ", pos: " + str(variant.pos))
                 # write to file
                 filter_vcfs_file.write(variant.line_content)
