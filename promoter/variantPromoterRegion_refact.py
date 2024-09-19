@@ -203,6 +203,11 @@ def find_lowest_variant(lowest_variant, vcf_file, current_promoter, upper_bound,
 
 def find_variants_in_bound(lowest_variant, vcf_file, current_promoter, upper_bound, lower_bound, previous_variants):
     variants_in_bound = []
+    
+    # check for edge case
+    if lowest_variant.lineInPromoter(upper_bound, lower_bound, current_promoter) != "in":
+        lowest_variant = vcf_file.nextLine(lowest_variant)
+    
     while lowest_variant.isGene and lowest_variant.lineInPromoter(upper_bound, lower_bound, current_promoter) == "in":
         if lowest_variant.getGenePosition() not in previous_variants:
             variants_in_bound.append(lowest_variant)
