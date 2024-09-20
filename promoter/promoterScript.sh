@@ -27,16 +27,16 @@ full_output_path="$output_path/$name"
 output_path_filtered="$full_output_path/regionsOfInterest.bed"
 
 # path of output in variant promoter
-output_path_vcf="$full_output_path/vcf_promoter_regions"
-output_sum_path="$full_output_path/variants_per_promoter"
+output_path_vcf="$full_output_path/snp_in_regions"
+output_sum_path="$full_output_path/distribution_on_ROI"
 
 # part of output in summary for result
-output_path_summary="$full_output_path/summary_promoter.tsv"
-output_path_sum="$full_output_path/summary_sum_variants.tsv"
+output_path_summary="$full_output_path/summary_SNP.tsv"
+output_path_sum="$full_output_path/summary_ROI.tsv"
 
 # part of output in statistical analysis
-output_path_statistcal_snp="$full_output_path/statistical_result.tsv"
-output_path_statistcal_sum="$full_output_path/statistical_sum_variant_result.tsv"
+output_path_statistcal_snp="$full_output_path/statistical_result_SNP.tsv"
+output_path_statistcal_sum="$full_output_path/statistical_result_ROI.tsv"
 
 # check and create necessary output folder
 if [ ! -d "$output_path" ]; then

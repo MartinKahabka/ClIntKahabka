@@ -23,7 +23,7 @@ output_sum_path=$8
 # pattern matching for dna_vcf files
 pattern="*.vcf"
 files=$(find "$input_path" -name "$pattern")
-full_output_path="$output_path/vcf_promoter_regions"
+full_output_path="$output_path/snp_in_regions"
 
 # create dir, check for output dir
 if [ ! -d "$output_path" ]; then
