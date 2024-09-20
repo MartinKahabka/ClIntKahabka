@@ -9,7 +9,6 @@ echo "start: $6"
 echo "end: $7"
 echo "path_patient_info: $8"
 echo "fast: $9"
-echo "mode: $10"
 
 name=$1
 output_path=$2
@@ -20,7 +19,6 @@ start=$6
 end=$7
 path_patient=$8
 fast=$9
-mode=$10
 
 # path of output folder
 full_output_path="$output_path/$name"
@@ -29,16 +27,16 @@ full_output_path="$output_path/$name"
 output_path_filtered="$full_output_path/regionsOfInterest.bed"
 
 # path of output in variant promoter
-output_path_vcf="$full_output_path/vcf_promoter_regions"
-output_sum_path="$full_output_path/variants_per_promoter"
+output_path_vcf="$full_output_path/snp_in_regions"
+output_sum_path="$full_output_path/distribution_on_ROI"
 
 # part of output in summary for result
-output_path_summary="$full_output_path/summary_promoter.tsv"
-output_path_sum="$full_output_path/summary_sum_variants.tsv"
+output_path_summary="$full_output_path/summary_SNP.tsv"
+output_path_sum="$full_output_path/summary_ROI.tsv"
 
 # part of output in statistical analysis
-output_path_statistcal_snp="$full_output_path/statistical_result.tsv"
-output_path_statistcal_sum="$full_output_path/statistical_sum_variant_result.tsv"
+output_path_statistcal_snp="$full_output_path/statistical_result_SNP.tsv"
+output_path_statistcal_sum="$full_output_path/statistical_result_ROI.tsv"
 
 # check and create necessary output folder
 if [ ! -d "$output_path" ]; then
@@ -61,14 +59,14 @@ fi
 python3 regionOfInterestFilter.py -d "$database" -g "$gene_names" -o "$output_path_filtered"
 
 # run variant promoter
-sh ./runVariantProm.sh $name $full_output_path $input_path_vcf_patient $output_path_filtered $start $end $fast $output_sum_path
+sh ./runVariantFilter.sh $name $full_output_path $input_path_vcf_patient $output_path_filtered $start $end $fast $output_sum_path
 
 # summary for result 
-python3 summaryPromoterResults.py -i "$output_path_vcf" -p "$path_patient" -o "$output_path_summary"
-python3 summarySumOfVariants.py -i "$output_sum_path" -p "$path_patient" -o "$output_path_sum"
+python3 summarySNP.py -i "$output_path_vcf" -p "$path_patient" -o "$output_path_summary"
+python3 summaryROI.py -i "$output_sum_path" -p "$path_patient" -o "$output_path_sum"
 
 
 # statistical analysis
-Rscript statisticalAnalysisPromoter.R "$output_path_summary" "$output_path_statistcal_snp"
-Rscript statisticalAnalysisSum.R "$output_path_sum" "$output_path_statistcal_sum"
+Rscript statisticalAnalysisSNP.R "$output_path_summary" "$output_path_statistcal_snp"
+Rscript statisticalAnalysisROI.R "$output_path_sum" "$output_path_statistcal_sum"
 

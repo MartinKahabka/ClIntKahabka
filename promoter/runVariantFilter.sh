@@ -23,7 +23,7 @@ output_sum_path=$8
 # pattern matching for dna_vcf files
 pattern="*.vcf"
 files=$(find "$input_path" -name "$pattern")
-full_output_path="$output_path/vcf_promoter_regions"
+full_output_path="$output_path/snp_in_regions"
 
 # create dir, check for output dir
 if [ ! -d "$output_path" ]; then
@@ -40,14 +40,14 @@ if $fast == "true"; then
     full_input_path="$input_path/$file"
     echo filename "$file"
     # run script
-    python3 "variantPromoterRegion_refact.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end" -f "$output_sum_path"
+    python3 "variantFilter_binary.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end" -f "$output_sum_path"
     done
 else
     for file in $files; do
         full_input_path="$input_path/$file"
         echo filename "$file"
         # run script
-        python3 "variantPromoterRegion.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end" -f "$output_sum_path"
+        python3 "variantFilter_linear.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end" -f "$output_sum_path"
     done
 fi
 # python3 variantPromoterRegion.py -n "alpha" -o "informationAndData/vcfsPromoter/" -v "informationAndData/test_vcf_file" -p informationAndData/GRCh37_promoterChrPos_testCopy.bed -s "500" -e "100"
