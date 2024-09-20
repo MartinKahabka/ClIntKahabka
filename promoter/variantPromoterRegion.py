@@ -218,7 +218,7 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
     for line in vcf_file:
         if line[0] != '#' and line[0] != '\n':
             contain = line.split('\t')
-            
+
             # define variant/promoter
             variant = Variant(contain[0], int(contain[1]), line)
             current_promoter = promoter_regions[pointer_promoter]

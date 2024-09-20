@@ -332,7 +332,6 @@ def find_variants_in_bound(lowest_variant, variant_file, current_promoter, upper
         lowest_variant = variant_file.nextLine(lowest_variant)
         
     return (previous_variants, variants_in_bound)
-        
 
 def sortGenePos(x1 : Region, x2 : Region):
     """ Compares the position of two genome positions (chromosome and position) over the whole genome.
