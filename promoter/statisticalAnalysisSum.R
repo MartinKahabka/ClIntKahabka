@@ -1,4 +1,5 @@
 # author: Martin Kahabka
+# conducts a KS-test for every region of interest, saves the results in file
 print("--- START PROGRAMM STATISTICALANALYSISSUM.R")
 tryCatch({
   library(tzdb, lib.loc = "./rLibs")
@@ -11,7 +12,6 @@ tryCatch({
 args <- commandArgs(trailingOnly = TRUE)
 input_path <- args[1]
 output_path <- args[2]
-
 print(input_path)
 print(output_path)
 
@@ -48,7 +48,7 @@ while (length(line) > 0) {
   } else {
     # perform test and add to list of tests
     t <- ks.test(pos, y = neg, alternative = "two.sided")
-    # compare signifikanzniveau to p_values
+    # compare significant level to p_values
     if (t$p.value <= p_value_adjusted) {
       result <- "significant"
     } else {
@@ -69,7 +69,6 @@ colnames(results_analysis) <- col_result
 
 # write out output file
 write_tsv(results_analysis, path = output_path)
-
 
 close(output_file)
 
