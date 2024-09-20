@@ -67,6 +67,6 @@ python3 summaryROI.py -i "$output_sum_path" -p "$path_patient" -o "$output_path_
 
 
 # statistical analysis
-Rscript statisticalAnalysisPromoter.R "$output_path_summary" "$output_path_statistcal_snp"
-Rscript statisticalAnalysisSum.R "$output_path_sum" "$output_path_statistcal_sum"
+Rscript statisticalAnalysisSNP.R "$output_path_summary" "$output_path_statistcal_snp"
+Rscript statisticalAnalysisROI.R "$output_path_sum" "$output_path_statistcal_sum"
 
