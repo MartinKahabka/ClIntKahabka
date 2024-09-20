@@ -59,7 +59,7 @@ fi
 python3 regionOfInterestFilter.py -d "$database" -g "$gene_names" -o "$output_path_filtered"
 
 # run variant promoter
-sh ./runVariantProm.sh $name $full_output_path $input_path_vcf_patient $output_path_filtered $start $end $fast $output_sum_path
+sh ./runVariantFilter.sh $name $full_output_path $input_path_vcf_patient $output_path_filtered $start $end $fast $output_sum_path
 
 # summary for result 
 python3 summaryPromoterResults.py -i "$output_path_vcf" -p "$path_patient" -o "$output_path_summary"
