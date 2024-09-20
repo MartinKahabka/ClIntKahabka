@@ -175,11 +175,11 @@ def add_variants_from_file(input_path, file_name, variant_information, severe):
                 pos = int(content[1])
                 key = (chrom, pos)
                 
-                # avoid double counting of same variants
-                double_variants.add(key)
-                
                 # add variant info to dict
                 variant_information = add_variant_information(key, variant_information, severe, double_variants)
+                
+                # avoid double counting of same variants
+                double_variants.add(key)
     return variant_information
 
 def add_variant_information(key, variants, severe, double_variants):
@@ -255,6 +255,7 @@ for file_name in os.listdir(input_path):
     if  id_and_condition[lab_id] != "" and lab_id != "nullID":
         # add variants to dict
         variant_information = add_variants_from_file(input_path, file_name, variant_information, severe)
+        print(variant_information)
                         
 print("--- SUCCESFUL ---")
 print("--- SAVE FILE TO " + output_file_path + " ---")
