@@ -9,7 +9,6 @@ echo "start: $6"
 echo "end: $7"
 echo "path_patient_info: $8"
 echo "fast: $9"
-echo "mode: $10"
 
 name=$1
 output_path=$2
@@ -20,7 +19,6 @@ start=$6
 end=$7
 path_patient=$8
 fast=$9
-mode=$10
 
 # path of output folder
 full_output_path="$output_path/$name"
