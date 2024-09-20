@@ -62,8 +62,8 @@ python3 regionOfInterestFilter.py -d "$database" -g "$gene_names" -o "$output_pa
 sh ./runVariantFilter.sh $name $full_output_path $input_path_vcf_patient $output_path_filtered $start $end $fast $output_sum_path
 
 # summary for result 
-python3 summaryPromoterResults.py -i "$output_path_vcf" -p "$path_patient" -o "$output_path_summary"
-python3 summarySumOfVariants.py -i "$output_sum_path" -p "$path_patient" -o "$output_path_sum"
+python3 summarySNP.py -i "$output_path_vcf" -p "$path_patient" -o "$output_path_summary"
+python3 summaryROI.py -i "$output_sum_path" -p "$path_patient" -o "$output_path_sum"
 
 
 # statistical analysis
