@@ -1,4 +1,6 @@
 # author: Martin Kahabka
+# collects all filtered variants and for each unique variant a overview is done containing the number of 
+# posSevere/negSevere/posNotSevere/negNotSevere amount of patients, then saved in file
 import argparse
 import os
 import re
