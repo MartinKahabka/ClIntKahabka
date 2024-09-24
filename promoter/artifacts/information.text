@@ -13,25 +13,45 @@ Enhancer Atlas
 
     reference genome: hg19 (source paper EnhancerAtlas 2.0)
 
+    flexible region size
+
     => Enhancer for PMBC-cells without known enhancer gene interactions contains much more enhancer
 
 EPDNew
     File of promoter regions by gene
+    1. chromosome
+    2. start of sequence
+    3. end of sequence
+    4. name promoter region
+    5. score
+    6. strand (+/-)
+    7. start codon (position TSS)
+    8. end codon
+
+    flixed regions size: 60
 
     refenerce genome: hg19
 
-Enhancer validated
+Silencer validated
     File of validated silencers for the categories
     organs: blood
     tissues: blood, lymphocyte
     cell lines: all
 
+    see promoter/artifacts/ for description of columns
+
+    fixed regions size: 200
+
     reference genome: hg19
 
-Enhancer predicted
+Silencer predicted
     File of predicted silencers for the categories
     organs: blood
     tissues: all
     cell lines: all
+
+    see promoter/artifacts/ for description of columns
+
+    flexible region size
 
     reference genome: hg19
