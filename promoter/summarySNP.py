@@ -128,7 +128,7 @@ counter_pat, id_and_condition = s_utils.get_patient_id(input_path, pattern)
 # extract lab_ID from patients
 print("--- READ IN CONDITIONS OF PATIENTS ---")
 
-id_and_condition, counter_severe, counter_not_severe = s_utils.add_condition(id_and_condition, info_file_path, id_and_condition)
+id_and_condition, counter_severe, counter_not_severe = s_utils.add_conditions(id_and_condition, info_file_path, id_and_condition)
 
 print("--- SUCCESFUL: number of severe/not severe patients: " + str(counter_severe) + "/" + str(counter_not_severe) + " ---")
 print("--- READ IN VARIANTS FROM PROMTER VCF FILES ---")

@@ -107,5 +107,5 @@ for file_name in os.listdir(input_path):
 # save to output file
 with open(path_to_output_file, "w") as output_file:
     for current_promoter in regions.values():
-        output_file.write(current_promoter.promoterToString() + "\n")
+        output_file.write(current_promoter.regionToString() + "\n")
                 
