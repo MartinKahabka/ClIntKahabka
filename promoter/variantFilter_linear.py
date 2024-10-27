@@ -70,7 +70,7 @@ print("Output path filtered vcfs: " + output_path)
 print("Output path sum of variants per region: " + output_sum_path)
 
 # read in regions of interest from file as ROI_region classes
-print("--- READ IN PROMOTER FILE ---")
+print("--- READ IN ROI FILE ---")
 regions_of_interest = vF_utils.readInROIs(ROI_path)
 
             
@@ -83,7 +83,7 @@ filename_vcf = os.path.basename(vcf_path)
 full_output_path = os.path.join(output_path, name + "_promoterVcfs_" + filename_vcf)
 full_sum_output_path = os.path.join(output_sum_path,  name + "_variantSum_" + filename_vcf)
 
-print("--- START LOOKING FOR VCFS IN PROMOTER REGIONS IN: " + vcf_path + " ---")
+print("--- START LOOKING FOR VCFS INSIDE ROIS IN: " + vcf_path + " ---")
 pointer_regions = 0
 previous_variants = set()
 

@@ -63,7 +63,7 @@ print("Output path: " + path_to_output_file)
 
 
 # get IDs of patients
-print("--- READ IN LAB IDS OF PATIENTS FOR PROMTER VCF FILES ---")
+print("--- READ IN LAB IDS OF PATIENTS ---")
 
 counter_pat, id_and_condition = s_utils.get_patient_id(input_path, pattern)
 
@@ -110,6 +110,6 @@ with open(path_to_output_file, "w") as output_file:
     for current_promoter in regions.values():
         output_file.write(current_promoter.regionToString() + "\n")
         
-print("--- SAVE FILE TO " + path_to_output_file + " ---")
+print("--- SAVE FILE TO: " + path_to_output_file + " ---")
 print("--------------- FINISHED SUMMARYROI.PY ---------------")
                 

@@ -54,6 +54,6 @@ with open(path_dataset_file, "r") as dataset, open(path_output_file, "w") as out
             output_file.write(region + "\n")
             num_filtered += 1
 
-print("--- OUTPUT SAVED UNDER " + path_output_file +  "---")
-print("--- FOUND REGIONS OF INTEREST: " +  str(num_filtered) + "---")
+print("--- OUTPUT SAVED UNDER " + path_output_file +  " ---")
+print("--- FOUND REGIONS OF INTEREST: " +  str(num_filtered) + " ---")
 print("--------------- FINISHED REGIONOFINTERESTFILTER.PY ----------------")

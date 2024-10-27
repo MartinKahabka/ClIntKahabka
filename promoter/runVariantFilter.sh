@@ -6,11 +6,11 @@ echo "Input arguments"
 echo "name: $1"
 echo "output_path: $2"
 echo "input_path: $3"
-echo "promoter_path: $4"
+echo "region_of_interest_path: $4"
 echo "start: $5"
 echo "end: $6"
 echo "binary_algorithm: $7"
-echo "output_promoter_path: $8"
+echo "output_regions_path: $8"
 
 name=$1
 output_path=$2

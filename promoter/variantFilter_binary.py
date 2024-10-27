@@ -346,7 +346,7 @@ print("Output path filtered vcfs: " + output_path)
 print("Output path sum of variants per region: " + output_sum_path)
 
 # read in regions of interest from file as ROI_region classes
-print("--- READ IN PROMOTER FILE ---")
+print("--- READ IN ROI FILE ---")
 regions_of_interest = vF_utils.readInROIs(ROI_path)
             
 # sort in case ROIs regions aren't sorted
@@ -359,7 +359,7 @@ full_vcf_output_path = os.path.join(output_path, name + "_promoterVcfs_" + filen
 full_sum_output_path = os.path.join(output_sum_path,  name + "_variantSum_" + filename_vcf)
 
 # read in vcf of patient
-print("--- START LOOKING FOR VCFS IN PROMOTER REGIONS IN: " + vcf_path + " ---")
+print("--- START LOOKING FOR VCFS INSIDE ROIS IN: " + vcf_path + " ---")
 input_file = vcf_file(vcf_path)
 filtered_vcf_file = output_file(full_vcf_output_path)
 promoter_sum_file = output_file(full_sum_output_path)

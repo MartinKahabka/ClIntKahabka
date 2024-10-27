@@ -122,7 +122,7 @@ print("Output path: " + output_file_path)
 
 
 # get IDs of patients
-print("--- READ IN LAB IDS OF PATIENTS FOR PROMTER VCF FILES ---")
+print("--- READ IN LAB IDS OF PATIENTS ---")
 
 counter_pat, id_and_condition = s_utils.get_patient_id(input_path, pattern)
 
@@ -159,5 +159,5 @@ with open(output_file_path, 'w') as output_file:
         s = variant_to_string(variant, variant_information[variant])
         output_file.write(s + "\n")
 
-print("--- SAVE FILE TO " + output_file_path + " ---")
+print("--- SAVE FILE TO: " + output_file_path + " ---")
 print("--------------- FINISHED SUMMARYSNP.PY ---------------")
