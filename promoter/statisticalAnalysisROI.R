@@ -61,7 +61,7 @@ results_analysis <- data.frame(
 colnames(results_analysis) <- col_result
 
 # write out output file
-write_tsv(results_analysis, path = output_path)
+write_tsv(results_analysis, file = output_path)
 
 close(output_file)
 
