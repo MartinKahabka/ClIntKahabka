@@ -5,8 +5,8 @@
 import argparse
 from functools import cmp_to_key
 import os
-from variantFilter_utils import Region, Variant
-import variantFilter_utils as vF_utils
+from utils.variantFilter_utils import Region, Variant
+import utils.variantFilter_utils as vF_utils
 
 def variantInBound(start : int, end : int, prom : Region, variant : Region) -> str:
     """ Compares the range of a given promoter to the position of a variant 

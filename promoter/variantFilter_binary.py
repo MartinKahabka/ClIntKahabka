@@ -6,7 +6,7 @@ import argparse
 from functools import cmp_to_key
 import os
 #from variantFilter_utils import 
-import variantFilter_utils as vF_utils
+import utils.variantFilter_utils as vF_utils
 
 class vcf_file:
     def __init__(self, input_path):
