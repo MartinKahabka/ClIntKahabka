@@ -39,7 +39,7 @@ class ROI_region:
         neg = "\t".join(self.notSevereCov)
         return "\n".join([header, pos, neg])
             
-print("--- START PROGRAM SUMMARYSUMOFVARIANTS.PY ---")
+print("--------------- START SUMMARYROI.PY ---------------")
 
 parser = argparse.ArgumentParser(description="Process input directory")
 parser.add_argument("-i", "--input_dir", help="Path to the input directory of the sum of variants per promoter per patient")
@@ -56,9 +56,10 @@ path_to_output_file = args.output_dir
 pattern = r"FO\d*x\d*"
 
 # print args
-print(input_path)
-print(info_file_path)
-print(path_to_output_file)
+print("Input arguments")
+print("Data files: " + input_path)
+print("Patients info: " + info_file_path)
+print("Output path: " + path_to_output_file)
 
 
 # get IDs of patients
@@ -73,12 +74,12 @@ print("--- READ IN CONDITIONS OF PATIENTS ---")
 
 id_and_condition, counter_severe, counter_not_severe = s_utils.add_conditions(id_and_condition, info_file_path, id_and_condition)
 
-print("--- SUCCESFUL: number of severe/not severe patients: " + str(counter_severe) + "/" + str(counter_not_severe) + " ---")
+print("--- number of severe/not severe patients: " + str(counter_severe) + "/" + str(counter_not_severe) + " ---")
 
 regions = {}
 # read in all files in input folder and counts variants per ROI
 for file_name in os.listdir(input_path):
-    print("Working in file: " + file_name)
+    print("--- WORKING ON FILE: " + file_name + " ---")
     # extract patients condition based on file name
     lab_id = s_utils.extract_id(file_name, pattern)
     severe = (True if id_and_condition[lab_id] == "COVID severe" else False)
@@ -108,4 +109,7 @@ for file_name in os.listdir(input_path):
 with open(path_to_output_file, "w") as output_file:
     for current_promoter in regions.values():
         output_file.write(current_promoter.regionToString() + "\n")
+        
+print("--- SAVE FILE TO " + path_to_output_file + " ---")
+print("--------------- FINISHED SUMMARYROI.PY ---------------")
                 

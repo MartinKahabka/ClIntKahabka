@@ -39,7 +39,7 @@ def variantInBound(start : int, end : int, prom : Region, variant : Region) -> s
     else:
         return "bigger" if relPos == 1 else "smaller"
 
-print("--- START PROGRAMM VARIANTPROMOTERREGION.PY ---")
+print("--------------- START VARIANTFILTER_LINEAR.PY ---------------")
 # read and parse input parameters
 parser = argparse.ArgumentParser(prog='variantPromoterRegion.py', description='Description of your script')
 parser.add_argument('-n', '--name_process', help="one unique identifer of the process", required=False)
@@ -48,31 +48,40 @@ parser.add_argument('-v', '--vcf_path',  help="path to the vcf file of the patie
 parser.add_argument('-p', '--path_promoters', help="path to the file with the promoter regions", required=False)
 parser.add_argument('-s', '--start', help="number of bases downstream of the promoter TSS that are considered promoter region", required=False)
 parser.add_argument('-e', '--end', help="number of bases upstream of the promoter TSS that are considered promoter region", required=False)
-parser.add_argument('-f', '--output_prom_path', help="output path for variant sum of promoter", required=False)
+parser.add_argument('-f', '--output_prom_path', help="output path for sum of variants per region", required=False)
 
 args = parser.parse_args()
 name = args.name_process
 output_path = args.output_dir
 vcf_path = args.vcf_path
-promoter_path = args.path_promoters
-start_prom = int(args.start)
-end_prom = int(args.end)
-output_prom_path = args.output_prom_path
+ROI_path = args.path_promoters
+start_region = int(args.start)
+end_region = int(args.end)
+output_sum_path = args.output_prom_path
+
+# print args
+print("Input arguments")
+print("name: " + name)
+print("vcf file: " + vcf_path)
+print("regions of interest: " + ROI_path)
+print("boundary upstream: " + str(start_region))
+print("boundary downstream: " + str(end_region))
+print("Output path filtered vcfs: " + output_path)
+print("Output path sum of variants per region: " + output_sum_path)
 
 # read in regions of interest from file as ROI_region classes
 print("--- READ IN PROMOTER FILE ---")
-regions_of_interest = vF_utils.readInROIs(promoter_path)
+regions_of_interest = vF_utils.readInROIs(ROI_path)
 
             
 # sort in case ROIs regions aren't sorted
 sorter = cmp_to_key(vF_utils.sortGenePos)
 regions_of_interest.sort(key = sorter)
-print("--- SUCCESS ---")
 
 # create names of output files
 filename_vcf = os.path.basename(vcf_path)
 full_output_path = os.path.join(output_path, name + "_promoterVcfs_" + filename_vcf)
-full_sum_output_path = os.path.join(output_prom_path,  name + "_variantSum_" + filename_vcf)
+full_sum_output_path = os.path.join(output_sum_path,  name + "_variantSum_" + filename_vcf)
 
 print("--- START LOOKING FOR VCFS IN PROMOTER REGIONS IN: " + vcf_path + " ---")
 pointer_regions = 0
@@ -81,7 +90,7 @@ previous_variants = set()
 # read in vcf of patient
 with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs_file:
     # write information into promoter vcf file
-    filter_vcfs_file.write(vF_utils.write_output_comment(os.path.basename(full_output_path), name, vcf_path, promoter_path, start_prom, end_prom))
+    filter_vcfs_file.write(vF_utils.write_output_comment(os.path.basename(full_output_path), name, vcf_path, ROI_path, start_region, end_region))
     
     # iterate over variants
     for line in vcf_file:
@@ -92,19 +101,18 @@ with open(vcf_path, 'r') as vcf_file, open(full_output_path, 'w') as filter_vcfs
             current_region = regions_of_interest[pointer_regions]
             
             # returns smaller, in or bigger. Relative pos of promoter to variant
-            relPos = variantInBound(start_prom, end_prom, current_region, variant)
+            relPos = variantInBound(start_region, end_region, current_region, variant)
             
             # get current promoter
             while relPos == "smaller" and pointer_regions+1 != len(regions_of_interest):
                 # variant is upstream/higher chrom that promoter, step to next
                 pointer_regions += 1
-                relPos = variantInBound(start_prom, end_prom, regions_of_interest[pointer_regions], variant)
+                relPos = variantInBound(start_region, end_region, regions_of_interest[pointer_regions], variant)
                 
             # update promoter
             current_region = regions_of_interest[pointer_regions]
         
             if relPos == "in" and variant.identifier() not in previous_variants:
-                print("found vcf in promoter " + current_region.name + " on " + variant.chrom + ", pos: " + str(variant.pos))
                 # write to file
                 filter_vcfs_file.write(variant.line_content)
                 # update counter and add to known variants to void copies
@@ -116,4 +124,4 @@ with open(full_sum_output_path, "w") as promoter_sum_file:
     for promoter in regions_of_interest:
         promoter_sum_file.write(promoter.promToString() + "\n")
 
-print("SUCCESS: PROGRAMM FINISHED")
+print("--------------- FINISHED VARIANTFILTER_LINEAR.PY ---------------")

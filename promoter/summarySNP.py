@@ -98,7 +98,7 @@ def add_variant_information(key, variants, severe, double_variants):
     return variants
 
 
-print("--- START PROGRAM SUMMARYPROMOTERRESULTS.PY ---")
+print("--------------- START SUMMARYSNP.PY ---------------")
 
 parser = argparse.ArgumentParser(description="Process input directory")
 parser.add_argument("-i", "--input_dir", help="Path to the input directory of the filtered vcfs")
@@ -114,9 +114,11 @@ output_file_path = args.output_dir
 pattern = r"FO\d*x\d*"
 
 # print args
-print(input_path)
-print(info_file_path)
-print(output_file_path)
+print("Input arguments")
+print("Data files: " + input_path)
+print("Patients info: " + info_file_path)
+print("Output path: " + output_file_path)
+
 
 
 # get IDs of patients
@@ -137,7 +139,7 @@ print("--- READ IN VARIANTS FROM PROMTER VCF FILES ---")
 variant_information = {}
 # iterate through all files from input folder
 for file_name in os.listdir(input_path):
-    print("Working in file: " + file_name)
+    print("--- WORKING ON FILE: " + file_name + " ---")
     # get lab id and condition
     lab_id = s_utils.extract_id(file_name, pattern)
     severe = (True if id_and_condition[lab_id] == "COVID severe" else False)
@@ -145,11 +147,7 @@ for file_name in os.listdir(input_path):
     if  id_and_condition[lab_id] != "" and lab_id != "nullID":
         # add variants to dict
         variant_information = add_variants_from_file(input_path, file_name, variant_information, severe)
-        print(variant_information)
                         
-print("--- SUCCESFUL ---")
-print("--- SAVE FILE TO " + output_file_path + " ---")
-
 # add number of patients where variants does not occur
 variant_information = fill_up_dict(variant_information, counter_severe, counter_not_severe)
 
@@ -160,4 +158,6 @@ with open(output_file_path, 'w') as output_file:
     for variant in variant_information:
         s = variant_to_string(variant, variant_information[variant])
         output_file.write(s + "\n")
-print("--- SUCCESSFUL -> PROGRAMM TERMINATES ---")
+
+print("--- SAVE FILE TO " + output_file_path + " ---")
+print("--------------- FINISHED SUMMARYSNP.PY ---------------")

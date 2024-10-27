@@ -5,7 +5,6 @@
 import argparse
 from functools import cmp_to_key
 import os
-#from variantFilter_utils import 
 import utils.variantFilter_utils as vF_utils
 
 class vcf_file:
@@ -316,7 +315,7 @@ def variantFiltering_binary(input_file, result_file, prom_sum_file, prom, upstre
     
     return prev_vars
 
-print("--- START PROGRAMM VARIANTPROMOTERREGION_REFACT.PY ---")
+print("--------------- START VARIANTFILTER_BINARY.PY ---------------")
 # read and parse input parameters
 parser = argparse.ArgumentParser(prog='variantPromoterRegion.py', description='Description of your script')
 parser.add_argument('-n', '--name_process', help="one unique identifer of the process", required=False)
@@ -331,24 +330,33 @@ args = parser.parse_args()
 name = args.name_process
 output_path = args.output_dir
 vcf_path = args.vcf_path
-promoter_path = args.path_promoters
-start_prom = int(args.start)
-end_prom = int(args.end)
-output_prom_path = args.output_prom_path
+ROI_path = args.path_promoters
+start_region = int(args.start)
+end_region = int(args.end)
+output_sum_path = args.output_prom_path
+
+# print args
+print("Input arguments")
+print("name: " + name)
+print("vcf file: " + vcf_path)
+print("regions of interest: " + ROI_path)
+print("boundary upstream: " + str(start_region))
+print("boundary downstream: " + str(end_region))
+print("Output path filtered vcfs: " + output_path)
+print("Output path sum of variants per region: " + output_sum_path)
 
 # read in regions of interest from file as ROI_region classes
 print("--- READ IN PROMOTER FILE ---")
-regions_of_interest = vF_utils.readInROIs(promoter_path)
+regions_of_interest = vF_utils.readInROIs(ROI_path)
             
 # sort in case ROIs regions aren't sorted
 sorter = cmp_to_key(vF_utils.sortGenePos)
 regions_of_interest.sort(key = sorter)
-print("--- SUCCESS ---")
 
 # create names of output files
 filename_vcf = os.path.basename(vcf_path)
 full_vcf_output_path = os.path.join(output_path, name + "_promoterVcfs_" + filename_vcf)
-full_sum_output_path = os.path.join(output_prom_path,  name + "_variantSum_" + filename_vcf)
+full_sum_output_path = os.path.join(output_sum_path,  name + "_variantSum_" + filename_vcf)
 
 # read in vcf of patient
 print("--- START LOOKING FOR VCFS IN PROMOTER REGIONS IN: " + vcf_path + " ---")
@@ -357,14 +365,13 @@ filtered_vcf_file = output_file(full_vcf_output_path)
 promoter_sum_file = output_file(full_sum_output_path)
 
 # write command of output file
-filtered_vcf_file.write(vF_utils.write_output_comment(os.path.basename(full_vcf_output_path), name, vcf_path, promoter_path, start_prom, end_prom))
+filtered_vcf_file.write(vF_utils.write_output_comment(os.path.basename(full_vcf_output_path), name, vcf_path, ROI_path, start_region, end_region))
 
 # to avoid doubles
 previous_variants = set()
 
 # binary search for each 
 for region in regions_of_interest:
-    variantFiltering_binary(input_file, filtered_vcf_file, promoter_sum_file, region, start_prom, end_prom, previous_variants)
+    variantFiltering_binary(input_file, filtered_vcf_file, promoter_sum_file, region, start_region, end_region, previous_variants)
 
-print("FILE SAVED TO: " + filtered_vcf_file.path)
-print("SUCCESS: PROGRAMM FINISHED")
+print("--------------- FINISHED VARIANTFILTER_BINARY.PY ---------------")
