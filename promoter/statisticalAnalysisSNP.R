@@ -25,7 +25,7 @@ standart_p_value <- 0.05
 
 # fishers excat test
 # dataframe chr pos sig? p-value
-col_result <- c("ChrNum", "PosOnChr", "resultAnalysis", "p_value")
+col_result <- c("ChrNum", "PosOnChr", "p_value")
 results_matrix <- matrix(nrow = 0, ncol = length(col_result))
 for (i in seq_len(nrow(data))) {
   current <- data[i, ]
@@ -39,7 +39,7 @@ for (i in seq_len(nrow(data))) {
   test <- fisher.test(values)
   # get values for ouput file
   # saves to matrix
-  new_row <- c(current[[1]], current[[2]])
+  new_row <- c(current[[1]], current[[2]], test$p.value)
   results_matrix <- rbind(results_matrix, new_row)
 }
 # write over to data frame
