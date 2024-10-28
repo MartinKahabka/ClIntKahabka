@@ -1,6 +1,6 @@
  README for bash script pipeljneScript.sh (pipeline PiaVaRR). For a more detailed view of the input file structures, see below
 
-**parameter:** Script has 9 parameters `<br/>`
+**parameter:** Script has 9 parameters `<br>`
 name: unique identifier for a pipeline run `<br/>`
 output_path: path where the output folder is created `<br/>`
 input_path_vcf_patient: vcf files of the patients to be analysed `<br/>`
