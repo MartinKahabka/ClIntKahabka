@@ -22,8 +22,14 @@ path_dataset_file = args.database_path
 path_genes_file = args.gene_names
 path_output_file = args.output_dir
 
+# print args
+print("Input arguments")
+print("Dataset: " + path_dataset_file)
+print("List of genes: " +  path_genes_file)
+print("Output dir: " + path_output_file)
+
 # read gene names from file
-print("read in gene names")
+print("--- READ IN GENE NAMES ---")
 
 gene_names = set()
 with open(path_genes_file, "r") as gene_names_file:
@@ -32,7 +38,7 @@ with open(path_genes_file, "r") as gene_names_file:
         gene_names.add(name)
 
 # read in dataset and filter
-print("read in dataset and write to output file")
+print("--- READ IN DATASET AND WRITE TO OUTPUT FILE ---")
 num_filtered = 0
 with open(path_dataset_file, "r") as dataset, open(path_output_file, "w") as output_file:
     for region in dataset:
@@ -48,6 +54,6 @@ with open(path_dataset_file, "r") as dataset, open(path_output_file, "w") as out
             output_file.write(region + "\n")
             num_filtered += 1
 
-print("Output saved under " + path_output_file)
-print("Amount of regions of interest: " +  str(num_filtered))
+print("--- OUTPUT SAVED UNDER " + path_output_file +  " ---")
+print("--- FOUND REGIONS OF INTEREST: " +  str(num_filtered) + " ---")
 print("--------------- FINISHED REGIONOFINTERESTFILTER.PY ----------------")

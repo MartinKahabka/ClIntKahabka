@@ -1,77 +1,16 @@
 # author: Martin Kahabka
-# collects all filtered variants and for each unique variant a overview is done containing the number of 
-# posSevere/negSevere/posNotSevere/negNotSevere amount of patients, then saved in file
 import argparse
 import os
-import re
+import utils.summary_utils as s_utils
 
-# gets a string and a regex pattern that describes the unique ID of the patient
-def extract_id(name, pattern) -> str:
-    """ extracts id of the patient from name of file name using a given pattern
-
-    Args:
-        name (string): name of patient file
-        pattern (_type_): pattern to match string
-
-    Returns:
-        str: id of patient, "nullID" if pattern cannot be matched to patient file
-    """
-    try:
-        id = re.search(pattern, name).group()   
-    except AttributeError:
-        id = "nullID"
-    return id
-
-# input: dict, str
-# dict_id: dict with lab ids as keys
-# filename: path to file that contains the condition of the patients
-# output: (dict, int, int)
-# dict_id: input dict with added conditions
-# num_severe: number of patients with condition severe
-# num_not_severe: number of patients with other condition
-def add_conditions(dict_id, filename):
-    """ matches conditions (severe/not severe) to the the patients ids
-
-    Args:
-        dict_id ( dict[string : string] ): input dict without conditions
-        filename (string): path to file that contains the condition of the patients
-
-    Returns:
-        ( dict[string : string], integer, integer): input dict with added conditions \n
-                                                    number of patients with severe condition \n
-                                                    number of patients with not severe condition
-    """
-    num_severe = 0
-    num_not_severe = 0
-    # open metadata fole
-    with open(filename, 'r') as info_file:
-        for line in info_file:
-            # get information from line
-            content = line.split("\t")
-            lab_id = content[2]
-            condition = content[15]
-            
-            # check for header line and check if lab id correlates to patient
-            if lab_id != "Lab ID" and lab_id in id_and_condition:
-                dict_id[lab_id] = condition
-                # add to counter
-                if condition == "COVID severe":
-                    num_severe += 1
-                else:
-                    num_not_severe += 1
-    return (dict_id, num_severe, num_not_severe)
-
-# gets dict and fills up the negative counter (num of patients that do not have the mutation) 
-# of the dictionary according to the counter of num_severe and num_not_severe
-# fill up posNegative and negNegative
 def fill_up_dict(dict_variant, num_severe, num_not_severe) -> dict:
-    """ fills in the number of patients with not variants (posNegative and negNegativ) 
+    """ fills in the number of patients with no variants (posNegative and negNegativ) 
         based on the total number of patients and the number of patients with variants
 
     Args:
         dict_variant ( dict[string : array[integer]] ): dict with variant information
-        num_severe (_type_): number of patients with severe condition
-        num_not_severe (_type_): number of patients without severe condition
+        num_severe (_type_): total number of patients with severe condition
+        num_not_severe (_type_): total number of patients without severe condition
 
     Returns:
         dict: updated dict containing the variant information 
@@ -85,7 +24,6 @@ def fill_up_dict(dict_variant, num_severe, num_not_severe) -> dict:
         dict_variant[variant] = value
     return dict_variant
 
-# gets the information about a variant and returns a string containing the information
 def variant_to_string(name, infos) -> str:
     """ gets key and value of a single variant from dict and returns the information as a string
 
@@ -103,54 +41,6 @@ def variant_to_string(name, infos) -> str:
     # chrom and pos of variant
     str_name = name[0] + "\t" + str(name[1])
     return str_name + str_infos
-
-def comments_file(filename, input_file_path, num_severe, num_not_severe, numVariants) -> str:
-    """ creates comment for file containing useful information
-
-    Args:
-        filename (string): name of output file
-        input_file_path (string): name of input file
-        num_severe (integer): number of patients with severe condition
-        num_not_severe (integer): number of patients without severe condition
-        numVariants (integer): total number of found variants
-
-    Returns:
-        str: _description_
-    """
-    # extract unique name from pipeline
-    unique_name = os.path.split(input_file_path)[-1]
-    # build comment
-    comment = ""
-    comment += "# unique identifier: " + unique_name + "\n"
-    comment += "# input from " + input_file_path + "\n"
-    comment += "# output to " + filename + "\n"
-    comment += "# number of patients: " + str(num_severe + num_not_severe) + "\n"
-    comment += "# number of severe/not severe patients: " + str(num_severe) + "/" + str(num_not_severe) + "\n"
-    comment += "# number of variants found: " + str(numVariants) + "\n"
-    comment += "# pos/neg corresponds to number of patients where variant is there/not there" + "\n"
-    comment += "# severe/NotSevere corresponds to number of patients with have severe/not severe condition" + "\n"
-    comment += "chromosome\tposition\tposSevere\tnegSevere\tposNotSevere\tnegNotSevere" + "\n"
-    return comment
-
-def get_patient_id(variant_file_path, pattern_id):
-    """ reads in the file names from the input folder and creates a dict with the patient ids. Counts the number of 
-
-    Args:
-        variant_file_path (string): path to patients .vcf file
-        pattern_id (string): pattern to match
-
-    Returns:
-        (integer, dict[string : string]): number of patients and dict with patients id
-    """
-    counter_patients = 0
-    id_and_condition = {}
-    for metafile in os.listdir(variant_file_path):
-        counter_patients += 1
-        patient_ID = extract_id(metafile, pattern_id)
-        if patient_ID != "nullID":
-            id_and_condition[patient_ID] = ""
-    
-    return counter_patients, id_and_condition
 
 def add_variants_from_file(input_path, file_name, variant_information, severe):
     """ reads in the variant from one patient file and adds the variants to the given dict. Key of dict is variant and value is 
@@ -208,7 +98,7 @@ def add_variant_information(key, variants, severe, double_variants):
     return variants
 
 
-print("--- START PROGRAM SUMMARYPROMOTERRESULTS.PY ---")
+print("--------------- START SUMMARYSNP.PY ---------------")
 
 parser = argparse.ArgumentParser(description="Process input directory")
 parser.add_argument("-i", "--input_dir", help="Path to the input directory of the filtered vcfs")
@@ -224,21 +114,23 @@ output_file_path = args.output_dir
 pattern = r"FO\d*x\d*"
 
 # print args
-print(input_path)
-print(info_file_path)
-print(output_file_path)
+print("Input arguments")
+print("Data files: " + input_path)
+print("Patients info: " + info_file_path)
+print("Output path: " + output_file_path)
+
 
 
 # get IDs of patients
-print("--- READ IN LAB IDS OF PATIENTS FOR PROMTER VCF FILES ---")
+print("--- READ IN LAB IDS OF PATIENTS ---")
 
-counter_pat, id_and_condition = get_patient_id(input_path, pattern)
+counter_pat, id_and_condition = s_utils.get_patient_id(input_path, pattern)
 
 # read conditions from Q001H_sample_preparations_20230803115337.tsv
 # extract lab_ID from patients
 print("--- READ IN CONDITIONS OF PATIENTS ---")
 
-id_and_condition, counter_severe, counter_not_severe = add_conditions(id_and_condition, info_file_path)
+id_and_condition, counter_severe, counter_not_severe = s_utils.add_conditions(id_and_condition, info_file_path, id_and_condition)
 
 print("--- SUCCESFUL: number of severe/not severe patients: " + str(counter_severe) + "/" + str(counter_not_severe) + " ---")
 print("--- READ IN VARIANTS FROM PROMTER VCF FILES ---")
@@ -247,27 +139,25 @@ print("--- READ IN VARIANTS FROM PROMTER VCF FILES ---")
 variant_information = {}
 # iterate through all files from input folder
 for file_name in os.listdir(input_path):
-    print("Working in file: " + file_name)
+    print("--- WORKING ON FILE: " + file_name + " ---")
     # get lab id and condition
-    lab_id = extract_id(file_name, pattern)
+    lab_id = s_utils.extract_id(file_name, pattern)
     severe = (True if id_and_condition[lab_id] == "COVID severe" else False)
     
     if  id_and_condition[lab_id] != "" and lab_id != "nullID":
         # add variants to dict
         variant_information = add_variants_from_file(input_path, file_name, variant_information, severe)
-        print(variant_information)
                         
-print("--- SUCCESFUL ---")
-print("--- SAVE FILE TO " + output_file_path + " ---")
-
-# fill up dict
+# add number of patients where variants does not occur
 variant_information = fill_up_dict(variant_information, counter_severe, counter_not_severe)
 
-# save to file
+# save results to file
 with open(output_file_path, 'w') as output_file:
-    c = comments_file(output_file_path, input_path, counter_severe, counter_not_severe, len(variant_information))
+    c = s_utils.comments_file(output_file_path, input_path, counter_severe, counter_not_severe, len(variant_information))
     output_file.write(c)
     for variant in variant_information:
         s = variant_to_string(variant, variant_information[variant])
         output_file.write(s + "\n")
-print("--- SUCCESSFUL -> PROGRAMM TERMINATES ---")
+
+print("--- SAVE FILE TO: " + output_file_path + " ---")
+print("--------------- FINISHED SUMMARYSNP.PY ---------------")

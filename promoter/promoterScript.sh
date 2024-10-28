@@ -1,5 +1,6 @@
 #!/bin/bash -v 3.2  # Use version 3.2
-
+# print arguments
+echo "--------------- START SCRIPT ---------------"
 echo "name: $1"
 echo "output_path: $2"
 echo "input_path_vcf_patient: $3"
@@ -8,8 +9,9 @@ echo "database: $5"
 echo "start: $6"
 echo "end: $7"
 echo "path_patient_info: $8"
-echo "fast: $9"
+echo "binary_algorithm: $9"
 
+# parse arguments
 name=$1
 output_path=$2
 input_path_vcf_patient=$3
@@ -70,3 +72,4 @@ python3 summaryROI.py -i "$output_sum_path" -p "$path_patient" -o "$output_path_
 Rscript statisticalAnalysisSNP.R "$output_path_summary" "$output_path_statistcal_snp"
 Rscript statisticalAnalysisROI.R "$output_path_sum" "$output_path_statistcal_sum"
 
+echo "--------------- FINISHED SCRIPT ---------------"

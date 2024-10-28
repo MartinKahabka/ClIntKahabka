@@ -5,6 +5,7 @@
 import argparse
 from functools import cmp_to_key
 import os
+import utils.variantFilter_utils as vF_utils
 
 class vcf_file:
     def __init__(self, input_path):
@@ -118,9 +119,19 @@ class vcf_line:
             self.isGene = False
             
     def getStringLine(self):
+        """
+        Returns:
+            string: whole line from file
+        """
         return self.raw_data
     
     def getGenePosition(self):
+        """ returns position of variant
+
+        Returns:
+            string: corresponding chromosome \n
+            int: position of variant on chromosome
+        """
         return self.array_data[0], int(self.array_data[1])
     
     def compareGenePos(self, second_gene):
@@ -135,8 +146,8 @@ class vcf_line:
                  0 else
         """
         # get chr
-        chr1 = chrToNumber(self.chr)
-        chr2 = chrToNumber(second_gene.chrom)
+        chr1 = vF_utils.chrToNumber(self.chr)
+        chr2 = vF_utils.chrToNumber(second_gene.chrom)
         # lower chromosome, less big
         if chr1 < chr2:
             return -1
@@ -169,83 +180,13 @@ class vcf_line:
         promPos = prom.pos
         variantPos = self.pos
         # check if chromosoms are equal
-        if chrToNumber(prom.chrom) == chrToNumber(self.chr): 
+        if vF_utils.chrToNumber(prom.chrom) == vF_utils.chrToNumber(self.chr): 
             # define bound and check
             downBound = promPos - start
             upBound = promPos +  end
             if  downBound <= variantPos <= upBound:
                 return "in"
         return "out"
-
-class Region:
-    def __init__(self, c, p):
-        self.chrom = c
-        self.pos = p
-    
-        
-class Variant(Region):
-    def __init__(self, c, p, l):
-        super().__init__(c, p)
-        self.line_content = l
-    
-    def identifier(self):
-        """
-        returns unique identifier for variant
-        """
-        return self.chrom + " " + str(self.pos)
-
-class Promoter(Region):
-    def __init__(self, c, p, l, n, num):
-        super().__init__(c, p)
-        self.line_content = l
-        self.name = n
-        self.num_variants = num
-    
-    def promToString(self):
-        prom_as_array = [self.chrom, str(self.pos), self.name, str(self.num_variants)]
-        return '\t'.join(prom_as_array)
-
-def chrToNumber(chrom):
-    """ Converts a string identifier of a chromosome to and integer. \n
-        Converts X, Y and MT string to numbers 23-25
-
-    Args:
-        chrom (string): string identifier of chromosome
-
-    Returns:
-        integer: integer identifier of chromosome
-    """
-    rest = chrom[3:]
-    if rest == 'X':
-        return 23
-    if rest == 'Y':
-        return 24
-    if rest == "MT":
-        return 25
-    else:
-        return int(rest)
-                    
-def getCommand(output_path, name, vcf_path, promoter_path, start, end) -> str:
-    """ Returns the comment for the output file
-
-    Args:
-        output_path (string): full output path to file
-        name (string): name of process
-        vcf_path (string): path of .vcf file of patient
-        promoter_path (string): path to promoter file
-        start (integer): range downstream of TSS
-        end (integer): range upstream of TSS
-
-    Returns:
-        string: concatentation informations used as comment for output file
-    """
-    command = ""
-    command += "# Name of file: " + os.path.basename(output_path) + "\n"
-    command += "# Name of process: " + name + "\n"
-    command += "# Patient vcf file path: " + vcf_path + "\n"
-    command += "# Promoter region file path:" + promoter_path + "\n"
-    command += "# Length Down/Upstream region of promoter TSS side: " + str(start) + "/" + str(end) + "\n"
-    return command
 
 def binarySearch_line(start_byte, end_byte, variant_file, current_promoter):
     """ conducts a binary search to find the variant that is, in relation to the other variants, 
@@ -333,82 +274,6 @@ def find_variants_in_bound(lowest_variant, variant_file, current_promoter, upper
         
     return (previous_variants, variants_in_bound)
 
-def sortGenePos(x1 : Region, x2 : Region):
-    """ Compares the position of two genome positions (chromosome and position) over the whole genome.
-
-    Args:
-        x1 (Region): first region to compare
-        x2 (Region): second region to compar
-
-    Returns:
-        integer: 1 if x1 is bigger that x2 \n
-                 -1 if x1 is lower that x2 \n
-                 0 else
-    """
-    # get chr
-    chr1 = chrToNumber(x1.chrom)
-    chr2 = chrToNumber(x2.chrom)
-    # lower chromosome, less big
-    if chr1 < chr2:
-        return -1
-    elif chr1 > chr2:
-        return 1
-    # same chromosome
-    else:
-        pos1 = x1.pos
-        pos2 = x2.pos
-        if pos1 < pos2:
-            return -1
-        elif pos1 > pos2:
-            return 1
-    # pos are exactly the same
-    return 0
-
-def write_output_comment(path, n, vcf_p, promoter_p, start, end):
-    """ Returns the comment for the output file
-
-    Args:
-        path (string): full output path to file
-        n (string): name of process
-        vcf_p (string): path of .vcf file of patient
-        promoter_p (string): path to promoter file
-        start (integer): range downstream of TSS
-        end (integer): range upstream of TSS
-
-    Returns:
-        string: concatentation informations used as comment for output file
-    """
-    c = "# Name of file: " + path + "\n"
-    c += "# Name of process: " + n + "\n"
-    c += "# Patient vcf file path: " + vcf_p + "\n"
-    c += "# Promoter region file path:" + promoter_p + "\n"
-    c += "# Length Down/Upstream region of promoter TSS side: " + str(start) + "/" + str(end) + "\n"
-    return c
-
-def readInPromoter(prom_path: str):
-    """ Read in file and returns list of promoters from this file
-
-    Args:
-        prom_path (string): Path to file with promoters 
-
-    Returns:
-        array[Promoter]: Array containing the promoters
-    """
-    with open(prom_path, 'r') as file:
-        # get promoters regions of all promoters
-        promoter_regions = []
-        for line in file:
-            if line[0] != '#':
-                contain = line.split('\t')
-                chrom = contain[0]
-                pos = int(contain[1])
-                name_prom = contain[3]
-                num_of_vars = 0
-                # add to promoter regions
-                p = Promoter(chrom, pos, line, name_prom, num_of_vars)
-                promoter_regions.append(p)
-    return promoter_regions
-
 def variantFiltering_binary(input_file, result_file, prom_sum_file, prom, upstream, downstream, prev_vars):
     """ conducts a binary search for a given promoter. Save the found variants to a output file
         and the number of variant per promoter to another output file
@@ -432,13 +297,13 @@ def variantFiltering_binary(input_file, result_file, prom_sum_file, prom, upstre
     # check if vcf file is not empty
     if start < end:
         
-        # closest line at promoter (below or above)
+        # binary search to find closest line/variant to promoter (below or above)
         lowest_line = binarySearch_line(start, end, input_file, prom)
         
         # get most upstream variant in boundary of promoter
         lowest_line = find_lowest_variant(lowest_line, input_file, prom, upstream, downstream)
         
-        # search upwards for other variants and count sum of variants
+        # search downstream for other variants and count sum of variants
         prev_vars, variants_in_bound = find_variants_in_bound(lowest_line, input_file, prom, upstream, downstream, prev_vars)
         
         # write found variants to output file
@@ -450,10 +315,9 @@ def variantFiltering_binary(input_file, result_file, prom_sum_file, prom, upstre
     
     return prev_vars
 
-print("--- START PROGRAMM VARIANTPROMOTERREGION_REFACT.PY ---")
-
+print("--------------- START VARIANTFILTER_BINARY.PY ---------------")
+# read and parse input parameters
 parser = argparse.ArgumentParser(prog='variantPromoterRegion.py', description='Description of your script')
-
 parser.add_argument('-n', '--name_process', help="one unique identifer of the process", required=False)
 parser.add_argument('-o', '--output_dir',  help="where the output should be saved", required=False)
 parser.add_argument('-v', '--vcf_path',  help="path to the vcf file of the patient", required=False)
@@ -463,44 +327,51 @@ parser.add_argument('-e', '--end', help="number of bases upstream of the promote
 parser.add_argument('-f', '--output_prom_path', help="output path for variant sum of promoter", required=False)
 
 args = parser.parse_args()
-
 name = args.name_process
 output_path = args.output_dir
 vcf_path = args.vcf_path
-promoter_path = args.path_promoters
-start_prom = int(args.start)
-end_prom = int(args.end)
-output_prom_path = args.output_prom_path
+ROI_path = args.path_promoters
+start_region = int(args.start)
+end_region = int(args.end)
+output_sum_path = args.output_prom_path
 
+# print args
+print("Input arguments")
+print("name: " + name)
+print("vcf file: " + vcf_path)
+print("regions of interest: " + ROI_path)
+print("boundary upstream: " + str(start_region))
+print("boundary downstream: " + str(end_region))
+print("Output path filtered vcfs: " + output_path)
+print("Output path sum of variants per region: " + output_sum_path)
 
-# read in promoter regions for file as promoter classes
-print("--- READ IN PROMOTER FILE ---")
-promoter_regions = readInPromoter(promoter_path)
+# read in regions of interest from file as ROI_region classes
+print("--- READ IN ROI FILE ---")
+regions_of_interest = vF_utils.readInROIs(ROI_path)
             
-# sort in case promoter regions aren't sorted
-sorter = cmp_to_key(sortGenePos)
-promoter_regions.sort(key = sorter)
-print("--- SUCCESS ---")
+# sort in case ROIs regions aren't sorted
+sorter = cmp_to_key(vF_utils.sortGenePos)
+regions_of_interest.sort(key = sorter)
 
-# name output file
-
+# create names of output files
 filename_vcf = os.path.basename(vcf_path)
 full_vcf_output_path = os.path.join(output_path, name + "_promoterVcfs_" + filename_vcf)
-full_sum_output_path = os.path.join(output_prom_path,  name + "_variantSum_" + filename_vcf)
+full_sum_output_path = os.path.join(output_sum_path,  name + "_variantSum_" + filename_vcf)
 
-print("--- START LOOKING FOR VCFS IN PROMOTER REGIONS IN: " + vcf_path + " ---")
 # read in vcf of patient
+print("--- START LOOKING FOR VCFS INSIDE ROIS IN: " + vcf_path + " ---")
 input_file = vcf_file(vcf_path)
 filtered_vcf_file = output_file(full_vcf_output_path)
 promoter_sum_file = output_file(full_sum_output_path)
 
 # write command of output file
-filtered_vcf_file.write(write_output_comment(os.path.basename(full_vcf_output_path), name, vcf_path, promoter_path, start_prom, end_prom))
+filtered_vcf_file.write(vF_utils.write_output_comment(os.path.basename(full_vcf_output_path), name, vcf_path, ROI_path, start_region, end_region))
 
 # to avoid doubles
 previous_variants = set()
-for promoter in promoter_regions:
-    variantFiltering_binary(input_file, filtered_vcf_file, promoter_sum_file, promoter, start_prom, end_prom, previous_variants)
 
-print("FILE SAVED TO: " + filtered_vcf_file.path)
-print("SUCCESS: PROGRAMM FINISHED")
+# binary search for each 
+for region in regions_of_interest:
+    variantFiltering_binary(input_file, filtered_vcf_file, promoter_sum_file, region, start_region, end_region, previous_variants)
+
+print("--------------- FINISHED VARIANTFILTER_BINARY.PY ---------------")

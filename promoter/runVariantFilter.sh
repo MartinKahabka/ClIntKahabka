@@ -1,15 +1,16 @@
 #!/bin/bash -v 3.2  # Use version 3.2
 
-echo "--- RUNNING PRORAM RUNVARIANTPROM.SH ---"
+echo "--------------- START RUNVARIANTPROM.SH ----------------"
+echo "Input arguments"
 # read in parameters
 echo "name: $1"
 echo "output_path: $2"
 echo "input_path: $3"
-echo "promoter_path: $4"
+echo "region_of_interest_path: $4"
 echo "start: $5"
 echo "end: $6"
-echo "fast $7"
-echo "output_promoter_path: $8"
+echo "binary_algorithm: $7"
+echo "output_regions_path: $8"
 
 name=$1
 output_path=$2
@@ -38,7 +39,7 @@ fi
 if $fast == "true"; then
     for file in $files; do
     full_input_path="$input_path/$file"
-    echo filename "$file"
+    echo filename: "$file"
     # run script
     python3 "variantFilter_binary.py" -n "$name" -o "$full_output_path" -v "$file" -p "$promoter_path" -s "$start" -e "$end" -f "$output_sum_path"
     done
@@ -52,4 +53,4 @@ else
 fi
 # python3 variantPromoterRegion.py -n "alpha" -o "informationAndData/vcfsPromoter/" -v "informationAndData/test_vcf_file" -p informationAndData/GRCh37_promoterChrPos_testCopy.bed -s "500" -e "100"
 
-echo "--- PROGRAMM FINISHED ---"
+echo "--------------- FINISHED RUNVARIANTPROM.SH ----------------"
